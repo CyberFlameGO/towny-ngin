@@ -3,7 +3,9 @@ package net.wesjd.towny.ngin;
 import com.google.inject.*;
 import com.google.inject.name.Named;
 import net.wesjd.towny.ngin.listeners.JoinLeaveListener;
+import net.wesjd.towny.ngin.storage.Data;
 import net.wesjd.towny.ngin.storage.GStorageModule;
+import net.wesjd.towny.ngin.storage.PackException;
 import net.wesjd.towny.ngin.storage.StorageFolder;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -22,14 +24,9 @@ public class Towny extends JavaPlugin {
             }
     );
 
-    static class Hello {
-        @Inject
-        @Named("players")
-        private StorageFolder folder;
-    }
-
     @Override
     public void onEnable() {
+<<<<<<< refs/remotes/origin/player-system
 <<<<<<< refs/remotes/origin/player-system
         getDataFolder().mkdirs();
 
@@ -38,6 +35,8 @@ public class Towny extends JavaPlugin {
 =======
         injector.getInstance(Hello.class);
 >>>>>>> Fix NPE, clean some stuff up
+=======
+>>>>>>> It works!
         registerListeners(JoinLeaveListener.class);
     }
 
