@@ -15,6 +15,9 @@ public class Towny extends JavaPlugin {
 
     @Override
     public void onEnable() {
+        getDataFolder().mkdirs();
+
+
         injector = Guice.createInjector(new TownyModule());
         registerListeners(JoinLeaveListener.class);
     }
