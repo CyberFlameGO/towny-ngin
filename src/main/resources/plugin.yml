@@ -1,0 +1,5 @@
+name: ngin
+main: net.wesjd.towny.ngin.Towny
+version: ${project.version}
+authors: [WesJD, TheMrGong]
+
