@@ -96,11 +96,10 @@ public class StorageFolder {
 
             packer.close();
 
-            FileUtils.copyToFile(new ByteArrayInputStream(packer.toByteArray()), new File(_folder, name));
+            FileUtils.copyInputStreamToFile(new ByteArrayInputStream(packer.toByteArray()), new File(_folder, name));
         } catch (IOException | ExecutionException e) {
             throw new PackException("Packing " + packable.getClass(), e);
         }
-
     }
 
     /**
@@ -113,7 +112,7 @@ public class StorageFolder {
      */
     public void unbox(String name, Object packable) throws PackException {
         try {
-            MessageUnpacker unpacker = MessagePack.newDefaultUnpacker(new FileInputStream(name));
+            MessageUnpacker unpacker = MessagePack.newDefaultUnpacker(new FileInputStream(new File(_folder, name)));
 
             List<Field> fields = _fieldCache.get(packable.getClass());
 
