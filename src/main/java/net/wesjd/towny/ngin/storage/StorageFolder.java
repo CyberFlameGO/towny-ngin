@@ -23,15 +23,31 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
+/**
+ * Manages the loading and saving of Objects to a specific folder.
+ */
 public class StorageFolder {
 
+    /**
+     * The injected {@link Towny} instance
+     */
     @Inject
     private Towny _main;
 
+    /**
+     * The injected {@link PackerStore} containing all {@link Packer} implementations
+     */
     @Inject
     private PackerStore _packerStore;
 
+    /**
+     * The folder all files are stored in
+     */
     private File _folder;
+
+    /**
+     * A {@link LoadingCache} containing a {@link List<Field>} for a specified {@link Class}
+     */
     private final LoadingCache<Class, List<Field>> _fieldCache = CacheBuilder.newBuilder()
             .expireAfterAccess(1, TimeUnit.MINUTES)
             .build(new CacheLoader<Class, List<Field>>() {
@@ -45,12 +61,26 @@ public class StorageFolder {
                 }
             });
 
+    /**
+     * Creates a new {@link StorageFolder}
+     *
+     * @param folder The folder to store files in
+     */
     public StorageFolder(String folder) {
         this._folder = new File(_main.getDataFolder(), folder);
 
         _folder.mkdir();
     }
 
+    /**
+     * Reads variables annotated with {@link Data}
+     * and saves them to a file specified with
+     * the name.
+     *
+     * @param name Name of the file to save to
+     * @param packable The object to save
+     * @throws PackException Thrown when unable to write to packer or a packer doesn't exist for a field
+     */
     public void packup(String name, Object packable) throws PackException {
         try {
             MessageBufferPacker packer = MessagePack.newDefaultBufferPacker();
@@ -81,6 +111,14 @@ public class StorageFolder {
 
     }
 
+    /**
+     * Sets all the variables for a
+     * specified object from a file
+     *
+     * @param name The name of the {@link File} containing the data
+     * @param packable The object to set fields for
+     * @throws PackException Thrown when the file doesn't exist or there isn't a packer for a field
+     */
     public void unbox(String name, Object packable) throws PackException {
         try {
 
@@ -91,8 +129,14 @@ public class StorageFolder {
             int amount = unpacker.unpackArrayHeader();
             for (int i = 0; i < amount; i++) {
                 String field = unpacker.unpackString();
-                Field f = findField(fields, field).orElseThrow(() -> new PackException("Unable to find field "+field));
-                f.set(packable, _packerStore.lookup(f.getType()).orElseThrow(() -> new PackException("Unable to find packer for type " + f.getType())).unbox(unpacker));
+                Field f = findField(fields, field)
+                        .orElseGet(() -> {
+                    _main.getLogger().warning("Unable to find field "+field+" in "+packable.getClass());
+                    return null;
+                });
+                if(f != null)
+                    f.set(packable, _packerStore.lookup(f.getType())
+                            .orElseThrow(() -> new PackException("Unable to find packer for type " + f.getType())).unbox(unpacker));
             }
 
         } catch (IOException | ExecutionException | IllegalAccessException e) {
@@ -100,6 +144,13 @@ public class StorageFolder {
         }
     }
 
+    /**
+     * Gets a {@link Field} from a {@link List<Field>} by its name
+     *
+     * @param fields The {@link List<Field>} to iterate through
+     * @param name The name of the field
+     * @return An {@link Optional<Field>}, empty if not found
+     */
     private Optional<Field> findField(List<Field> fields, String name) {
         return fields.stream().filter(f -> f.getName().equals(name)).findFirst();
     }
