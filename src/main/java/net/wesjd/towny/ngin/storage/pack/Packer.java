@@ -39,4 +39,5 @@ public abstract class Packer<T> {
         //noinspection unchecked
         return (Class<T>) ((ParameterizedType) getClass().getGenericSuperclass()).getActualTypeArguments()[0];
     }
+
 }
