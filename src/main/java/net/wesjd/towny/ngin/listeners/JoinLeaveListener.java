@@ -9,11 +9,11 @@ import org.bukkit.event.player.PlayerJoinEvent;
 public class JoinLeaveListener implements Listener {
 
     @Inject
-    private Towny main;
+    private Towny _main;
 
     @EventHandler
     public void onJoin(PlayerJoinEvent e) {
-        e.setJoinMessage("test, the version is " + main.getDescription().getVersion());
+        e.setJoinMessage("test, the version is " + _main.getDescription().getVersion());
     }
 
 }
