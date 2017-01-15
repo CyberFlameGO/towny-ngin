@@ -1,4 +1,4 @@
-package net.wesjd.towny.ngin.storage.pack.impl;
+package net.wesjd.towny.ngin.storage.pack.impl.java;
 
 import com.google.inject.Inject;
 import net.wesjd.towny.ngin.storage.pack.Packer;
