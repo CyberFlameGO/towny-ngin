@@ -4,12 +4,15 @@ import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.Singleton;
+import li.l1t.common.intake.provider.annotation.Sender;
 import net.milkbowl.vault.economy.Economy;
 import li.l1t.common.intake.CommandsManager;
 import net.wesjd.towny.ngin.command.TestCommand;
 import net.wesjd.towny.ngin.command.TownCommand;
+import net.wesjd.towny.ngin.command.TownyPlayerProvider;
 import net.wesjd.towny.ngin.listeners.JoinLeaveListener;
 import net.wesjd.towny.ngin.player.PlayerManager;
+import net.wesjd.towny.ngin.player.TownyPlayer;
 import net.wesjd.towny.ngin.storage.GStorageModule;
 import net.wesjd.towny.ngin.util.economy.EconomyInjection;
 import org.bukkit.Bukkit;
@@ -43,6 +46,9 @@ public class Towny extends JavaPlugin {
 
             commandsManager = new CommandsManager(this);
             commandsManager.getTranslator().setLocale(Locale.ENGLISH);
+            commandsManager.bind(TownyPlayer.class)
+                    .annotatedWith(Sender.class)
+                    .toProvider(new TownyPlayerProvider(commandsManager.getTranslator(), _injector.getInstance(PlayerManager.class)));
             commandsManager.registerCommand(new TestCommand(), "test");
             commandsManager.registerCommand(new TownCommand(), "town");
 
