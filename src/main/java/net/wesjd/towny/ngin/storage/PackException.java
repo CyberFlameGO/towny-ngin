@@ -1,6 +1,6 @@
 package net.wesjd.towny.ngin.storage;
 
-public class PackException extends Exception {
+public class PackException extends RuntimeException {
 
     public PackException(String reason, Throwable cause) {
         super(reason, cause);
