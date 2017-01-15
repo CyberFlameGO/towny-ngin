@@ -6,6 +6,8 @@ import com.google.inject.Injector;
 import com.google.inject.Singleton;
 import net.milkbowl.vault.economy.Economy;
 import li.l1t.common.intake.CommandsManager;
+import net.wesjd.towny.ngin.command.TestCommand;
+import net.wesjd.towny.ngin.command.TownCommand;
 import net.wesjd.towny.ngin.listeners.JoinLeaveListener;
 import net.wesjd.towny.ngin.player.PlayerManager;
 import net.wesjd.towny.ngin.storage.GStorageModule;
@@ -17,6 +19,7 @@ import org.bukkit.plugin.ServicePriority;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.Arrays;
+import java.util.Locale;
 
 public class Towny extends JavaPlugin {
 
@@ -37,6 +40,11 @@ public class Towny extends JavaPlugin {
         try {
             getDataFolder().mkdirs();
             registerListeners(JoinLeaveListener.class);
+
+            commandsManager = new CommandsManager(this);
+            commandsManager.getTranslator().setLocale(Locale.ENGLISH);
+            commandsManager.registerCommand(new TestCommand(), "test");
+            commandsManager.registerCommand(new TownCommand(), "town");
 
             final Plugin vault = getServer().getPluginManager().getPlugin("Vault");
             getServer().getServicesManager().register(Economy.class, _injector.getInstance(EconomyInjection.class), vault, ServicePriority.Normal);
