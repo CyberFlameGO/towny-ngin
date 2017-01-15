@@ -4,6 +4,7 @@ import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.Singleton;
+import li.l1t.common.intake.CommandsManager;
 import net.wesjd.towny.ngin.listeners.JoinLeaveListener;
 import net.wesjd.towny.ngin.player.PlayerManager;
 import net.wesjd.towny.ngin.storage.GStorageModule;
@@ -25,9 +26,15 @@ public class Towny extends JavaPlugin {
             }
     );
 
+    private CommandsManager commandsManager;
+
     @Override
     public void onEnable() {
         getDataFolder().mkdirs();
+
+        commandsManager = new CommandsManager(this);
+        commandsManager.registerCommand();
+
         registerListeners(JoinLeaveListener.class);
     }
 
