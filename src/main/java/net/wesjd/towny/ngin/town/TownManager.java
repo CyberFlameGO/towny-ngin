@@ -2,31 +2,37 @@ package net.wesjd.towny.ngin.town;
 
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
-import net.wesjd.towny.ngin.storage.Data;
 import net.wesjd.towny.ngin.storage.StorageFolder;
 
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
+import java.io.File;
+import java.util.*;
 
 public class TownManager {
 
     @Inject @Named("towns")
     private StorageFolder _storage;
 
-    @Data
     private Set<Town> _towns = new HashSet<>();
 
     public void saveTowns() {
-        _storage.packup("towns", _towns);
+        _towns.forEach(Town::save);
     }
 
     public void loadTowns() {
-        _storage.unbox("towns", _towns);
+        _towns.clear();
+        Arrays.stream(_storage.getAllFiles())
+                .map(File::getName)
+                .forEach(this::addTown);
+
+        _towns.forEach(Town::load);
     }
 
-    public boolean addTown(Town town) {
-        return _towns.add(town);
+    public boolean addTown(String name) {
+        return _towns.add(new Town(name.toLowerCase(), _storage));
+    }
+
+    public Optional<Town> getTown(String name) {
+        return _towns.stream().filter(t -> t.getTownName().equalsIgnoreCase(name)).findFirst();
     }
 
     public Collection<Town> getTowns() {

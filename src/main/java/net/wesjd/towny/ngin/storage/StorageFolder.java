@@ -146,6 +146,15 @@ public class StorageFolder {
     }
 
     /**
+     * Gets all the {@link File}'s in the folder
+     *
+     * @return
+     */
+    public File[] getAllFiles() {
+        return _folder.listFiles();
+    }
+
+    /**
      * Gets a {@link Field} from a {@link List<Field>} by its name
      *
      * @param fields The {@link List<Field>} to iterate through

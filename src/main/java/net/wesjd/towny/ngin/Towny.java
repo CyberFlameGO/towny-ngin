@@ -7,10 +7,7 @@ import com.google.inject.Singleton;
 import net.wesjd.towny.ngin.listeners.JoinLeaveListener;
 import net.wesjd.towny.ngin.player.PlayerManager;
 import net.wesjd.towny.ngin.storage.GStorageModule;
-import net.wesjd.towny.ngin.town.Town;
 import net.wesjd.towny.ngin.town.TownManager;
-import org.bukkit.Bukkit;
-import org.bukkit.Location;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -36,12 +33,6 @@ public class Towny extends JavaPlugin {
         getDataFolder().mkdirs();
         new File(getDataFolder(), "permissions").mkdirs();
         registerListeners(JoinLeaveListener.class);
-
-        TownManager instance = _injector.getInstance(TownManager.class);
-        instance.addTown(new Town("nigger town", new Location(Bukkit.getWorld("world"), 500, 500, 500)));
-        instance.saveTowns();
-        instance.addTown(new Town("WAOWOHOWAOWhAWH", null));
-        instance.loadTowns();
 
     }
 
