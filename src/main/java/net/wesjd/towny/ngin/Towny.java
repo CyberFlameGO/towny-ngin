@@ -36,7 +36,6 @@ public class Towny extends JavaPlugin {
                 }
             }
     );
-    private CommandsManager commandsManager;
 
     @Override
     public void onEnable() {
@@ -44,8 +43,8 @@ public class Towny extends JavaPlugin {
             getDataFolder().mkdirs();
             registerListeners(JoinLeaveListener.class);
 
-            commandsManager = new CommandsManager(this);
-            commandsManager.getTranslator().setLocale(Locale.ENGLISH);
+            final CommandsManager commandsManager = new CommandsManager(this);
+            commandsManager.getTranslator().setLocale(Locale.ROOT);
             commandsManager.bind(TownyPlayer.class)
                     .annotatedWith(Sender.class)
                     .toProvider(new TownyPlayerProvider(commandsManager.getTranslator(), _injector.getInstance(PlayerManager.class)));
