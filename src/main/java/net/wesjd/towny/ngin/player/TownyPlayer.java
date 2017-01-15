@@ -30,6 +30,7 @@ public class TownyPlayer extends OfflineTownyPlayer {
         super(storage, offline);
         _wrapped = wrapped;
         _attachment = new PermissionAttachment(Bukkit.getPluginManager().getPlugin("ngin"), _wrapped);
+        setRank(getRank()); //to give the player their permissions
     }
 
     @Override
