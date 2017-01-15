@@ -26,4 +26,14 @@ public class TownRank {
     public List<Permission> getPermissions() {
         return _permissions;
     }
+
+    @Override
+    public String toString() {
+        final StringBuilder sb = new StringBuilder("TownRank{");
+        sb.append("_name='").append(_name).append('\'');
+        sb.append(", _display='").append(_display).append('\'');
+        sb.append(", _permissions=").append(_permissions);
+        sb.append('}');
+        return sb.toString();
+    }
 }

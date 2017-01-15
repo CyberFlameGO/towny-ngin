@@ -40,8 +40,13 @@ public enum Rank {
         this._color = color;
 
         try {
-            final File permissionsFile = new File(Bukkit.getPluginManager().getPlugin("ngin").getDataFolder(), "permissions/" + toString().toLowerCase());
+
+            File permissionsFolder = new File(Bukkit.getPluginManager().getPlugin("ngin").getDataFolder(), "permissions");
+            if(!permissionsFolder.exists()) permissionsFolder.mkdir();
+
+            final File permissionsFile = new File(permissionsFolder, toString().toLowerCase());
             if (!permissionsFile.exists()) permissionsFile.createNewFile();
+
             Files.readLines(permissionsFile, Charsets.UTF_8).forEach(line -> _permissions.add(new Permission(line)));
         } catch (IOException ex) {
             ex.printStackTrace();

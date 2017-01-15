@@ -3,7 +3,6 @@ package net.wesjd.towny.ngin.player;
 import net.wesjd.towny.ngin.storage.Data;
 import net.wesjd.towny.ngin.storage.StorageFolder;
 import net.wesjd.towny.ngin.town.TownData;
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 import java.util.UUID;
@@ -57,6 +56,7 @@ public class OfflineTownyPlayer {
         _money = fill.getMoney();
         _rank = fill.getRank();
         _lastName = fill.getLastName();
+        _townData = fill.getTownData();
     }
 
     /**
@@ -67,9 +67,7 @@ public class OfflineTownyPlayer {
     OfflineTownyPlayer(StorageFolder storage, UUID uuid) {
         _storage = storage;
         _uuid = uuid;
-        System.out.println(">>>>>>>> previous rank: " + _rank);
         _storage.unbox(uuid.toString(), this);
-        System.out.println(">>>>>>>> after unboxing: " + _rank);
     }
 
     public UUID getUuid() {
@@ -106,6 +104,14 @@ public class OfflineTownyPlayer {
 
     public void setLastName(String lastName) {
         _lastName = lastName;
+    }
+
+    public TownData getTownData() {
+        return _townData;
+    }
+
+    public void setTownData(TownData townData) {
+        _townData = townData;
     }
 
     /**

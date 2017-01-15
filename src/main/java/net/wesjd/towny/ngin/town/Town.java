@@ -26,6 +26,9 @@ public class Town {
     @Data
     private String _townName;
 
+    @Data
+    private List<TownRank> _ranks = new ArrayList<>();
+
 
     public Town(String name, StorageFolder storage) {
         _townName = name;
@@ -74,6 +77,15 @@ public class Town {
 
     public void load() {
         _storage.unbox(_townName, this);
+    }
+
+    public void generateDefaultRanks() {
+        _ranks.add(new TownRank("mayor", "Mayor", Collections.emptyList()));
+        _ranks.add(new TownRank("member", "Town Member", Collections.emptyList()));
+    }
+
+    public Optional<TownRank> getRankByName(String name) {
+        return _ranks.stream().filter(r -> r.getName().equalsIgnoreCase(name)).findFirst();
     }
 
     @Override

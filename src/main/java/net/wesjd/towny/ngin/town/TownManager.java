@@ -27,8 +27,9 @@ public class TownManager {
         _towns.forEach(Town::load);
     }
 
-    public boolean addTown(String name) {
-        return _towns.add(new Town(name.toLowerCase(), _storage));
+    public Town addTown(String name) {
+        Town t = new Town(name.toLowerCase(), _storage);
+        return _towns.add(t) ? t : null;
     }
 
     public Optional<Town> getTown(String name) {

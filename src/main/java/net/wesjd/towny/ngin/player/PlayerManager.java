@@ -108,4 +108,12 @@ public class PlayerManager {
         _store.remove(player.getUniqueId()).save();
     }
 
+    /**
+     * Removes all players in the store and saves them
+     */
+    public void unload() {
+        _store.keySet().forEach(k -> _store.get(k).save());
+        _store.clear();
+    }
+
 }

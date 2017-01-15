@@ -17,4 +17,13 @@ public class TownData {
     public TownRank getTownRank() {
         return _townRank;
     }
+
+    @Override
+    public String toString() {
+        final StringBuilder sb = new StringBuilder("TownData{");
+        sb.append("_town='").append(_town).append('\'');
+        sb.append(", _townRank=").append(_townRank);
+        sb.append('}');
+        return sb.toString();
+    }
 }
