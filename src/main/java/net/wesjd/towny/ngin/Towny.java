@@ -11,6 +11,7 @@ import net.wesjd.towny.ngin.command.TownCommand;
 import net.wesjd.towny.ngin.listeners.JoinLeaveListener;
 import net.wesjd.towny.ngin.player.PlayerManager;
 import net.wesjd.towny.ngin.storage.GStorageModule;
+import net.wesjd.towny.ngin.town.TownManager;
 import net.wesjd.towny.ngin.util.economy.EconomyInjection;
 import org.bukkit.Bukkit;
 import org.bukkit.event.Listener;
@@ -18,6 +19,7 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.ServicePriority;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.io.File;
 import java.util.Arrays;
 import java.util.Locale;
 
@@ -30,6 +32,7 @@ public class Towny extends JavaPlugin {
                 protected void configure() {
                     bind(Towny.class).toInstance(Towny.this);
                     bind(PlayerManager.class).in(Singleton.class);
+                    bind(TownManager.class).in(Singleton.class);
                 }
             }
     );

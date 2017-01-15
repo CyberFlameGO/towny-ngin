@@ -17,7 +17,9 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
-import java.util.*;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
@@ -60,9 +62,10 @@ public class StorageFolder {
 
     /**
      * Creates a new {@link StorageFolder}
-     * @param towny The main class instance
+     *
+     * @param towny       The main class instance
      * @param packerStore The global store of packers
-     * @param folder The folder to store files in
+     * @param folder      The folder to store files in
      */
     public StorageFolder(Towny towny, PackerStore packerStore, String folder) {
         _towny = towny;
@@ -76,7 +79,7 @@ public class StorageFolder {
      * and saves them to a file specified with
      * the name.
      *
-     * @param name Name of the file to save to
+     * @param name     Name of the file to save to
      * @param packable The object to save
      * @throws PackException Thrown when unable to write to packer or a packer doesn't exist for a field
      */
@@ -94,7 +97,7 @@ public class StorageFolder {
                     Object obj = field.get(packable);
 
                     packer.packBoolean(obj != null); //signifies whether a field has data
-                    if(obj != null)
+                    if (obj != null)
                         p.packup(obj, packer);
                 } catch (IOException | IllegalAccessException e) {
                     e.printStackTrace();
@@ -104,7 +107,6 @@ public class StorageFolder {
             packer.close();
 
             FileUtils.copyInputStreamToFile(new ByteArrayInputStream(packer.toByteArray()), new File(_folder, name));
-
         } catch (IOException | ExecutionException e) {
             throw new PackException("Packing " + packable.getClass(), e);
         }
@@ -114,14 +116,15 @@ public class StorageFolder {
      * Sets all the variables for a
      * specified object from a file
      *
-     * @param name The name of the {@link File} containing the data
+     * @param name     The name of the {@link File} containing the data
      * @param packable The object to set fields for
      * @throws PackException Thrown when the file doesn't exist or there isn't a packer for a field
      */
     public void unbox(String name, Object packable) throws PackException {
         try {
             File file = new File(_folder, name);
-            if(file.exists()) {
+            if (file.exists()) {
+
                 MessageUnpacker unpacker = MessagePack.newDefaultUnpacker(new FileInputStream(file));
 
                 List<Field> fields = _fieldCache.get(packable.getClass());
@@ -147,10 +150,19 @@ public class StorageFolder {
     }
 
     /**
+     * Gets all the {@link File}'s in the folder
+     *
+     * @return
+     */
+    public File[] getAllFiles() {
+        return _folder.listFiles();
+    }
+
+    /**
      * Gets a {@link Field} from a {@link List<Field>} by its name
      *
      * @param fields The {@link List<Field>} to iterate through
-     * @param name The name of the field
+     * @param name   The name of the field
      * @return An {@link Optional<Field>}, empty if not found
      */
     private Optional<Field> findField(List<Field> fields, String name) {

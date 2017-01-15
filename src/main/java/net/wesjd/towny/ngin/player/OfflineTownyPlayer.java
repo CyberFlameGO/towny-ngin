@@ -2,6 +2,7 @@ package net.wesjd.towny.ngin.player;
 
 import net.wesjd.towny.ngin.storage.Data;
 import net.wesjd.towny.ngin.storage.StorageFolder;
+import net.wesjd.towny.ngin.town.TownData;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
@@ -40,6 +41,12 @@ public class OfflineTownyPlayer {
     private String _lastName;
 
     /**
+     * The current town and rank the player has in that town
+     */
+    @Data
+    private TownData _townData;
+
+    /**
      * Fills this offline player with a previous one (used in {@link TownyPlayer#TownyPlayer(Player, StorageFolder, OfflineTownyPlayer)})
      *
      * @param fill The offline player to fill from
@@ -60,7 +67,9 @@ public class OfflineTownyPlayer {
     OfflineTownyPlayer(StorageFolder storage, UUID uuid) {
         _storage = storage;
         _uuid = uuid;
+        System.out.println(">>>>>>>> previous rank: " + _rank);
         _storage.unbox(uuid.toString(), this);
+        System.out.println(">>>>>>>> after unboxing: " + _rank);
     }
 
     public UUID getUuid() {

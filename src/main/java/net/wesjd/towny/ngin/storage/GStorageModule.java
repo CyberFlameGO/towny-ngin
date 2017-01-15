@@ -21,4 +21,11 @@ public class GStorageModule extends AbstractModule {
         return new StorageFolder(towny, store, "players");
     }
 
+    @Provides
+    @Named("towns")
+    @Singleton
+    StorageFolder provideTownStorageFolder(Towny towny, PackerStore store) {
+        return new StorageFolder(towny, store, "towns");
+    }
+
 }
