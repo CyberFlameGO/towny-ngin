@@ -5,6 +5,7 @@ import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.Singleton;
 import net.milkbowl.vault.economy.Economy;
+import li.l1t.common.intake.CommandsManager;
 import net.wesjd.towny.ngin.listeners.JoinLeaveListener;
 import net.wesjd.towny.ngin.player.PlayerManager;
 import net.wesjd.towny.ngin.storage.GStorageModule;
@@ -32,6 +33,7 @@ public class Towny extends JavaPlugin {
                 }
             }
     );
+    private CommandsManager commandsManager;
 
     @Override
     public void onEnable() {
