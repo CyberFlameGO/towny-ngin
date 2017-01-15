@@ -1,4 +1,4 @@
-package net.wesjd.towny.ngin.storage.pack.impl.primitives;
+package net.wesjd.towny.ngin.storage.pack.impl.java.primitives;
 
 import net.wesjd.towny.ngin.storage.pack.Packer;
 import org.msgpack.core.MessagePacker;

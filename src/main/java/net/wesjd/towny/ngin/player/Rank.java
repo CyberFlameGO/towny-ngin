@@ -15,33 +15,23 @@ public enum Rank {
     /**
      * The rank's chat prefix
      */
-    private final String prefix;
+    private final String _prefix;
     /**
      * The rank's prefix color
      */
-    private final ChatColor color;
+    private final ChatColor _color;
 
     Rank(String prefix, ChatColor color) {
-        this.prefix = prefix;
-        this.color = color;
+        this._prefix = prefix;
+        this._color = color;
     }
 
-    /**
-     * Gets the rank's chat prefix
-     *
-     * @return The rank's chat prefix
-     */
     public String getPrefix() {
-        return prefix;
+        return _prefix;
     }
 
-    /**
-     * Gets the rank's prefix color
-     *
-     * @return The rank's prefix color
-     */
     public ChatColor getColor() {
-        return color;
+        return _color;
     }
 
 }
