@@ -101,7 +101,6 @@ public class StorageFolder {
             packer.close();
 
             FileUtils.copyInputStreamToFile(new ByteArrayInputStream(packer.toByteArray()), new File(_folder, name));
-
         } catch (IOException | ExecutionException e) {
             throw new PackException("Packing " + packable.getClass(), e);
         }
@@ -117,6 +116,7 @@ public class StorageFolder {
      */
     public void unbox(String name, Object packable) throws PackException {
         try {
+<<<<<<< master
 <<<<<<< master
             File file = new File(_folder, name);
             if(file.exists()) {
@@ -141,6 +141,8 @@ public class StorageFolder {
 =======
                     if (f != null)
 =======
+=======
+>>>>>>> Finish permissions system
             MessageUnpacker unpacker = MessagePack.newDefaultUnpacker(new FileInputStream(new File(_folder, name)));
 
             List<Field> fields = _fieldCache.get(packable.getClass());
@@ -154,8 +156,7 @@ public class StorageFolder {
                     return null;
                 });
                 if (f != null) {
-                    if(unpacker.unpackBoolean()) 
->>>>>>> Don't attempt to save null values
+                    if(unpacker.unpackBoolean())
                         f.set(packable, _packerStore.lookup(f.getType())
                                 .orElseThrow(() -> new PackException("Unable to find packer for type " + f.getType())).unbox(unpacker));
 >>>>>>> Don't attempt to save null values

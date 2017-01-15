@@ -38,6 +38,10 @@ public class OfflineTownyPlayer {
     @Data
     private String _lastName;
 
+    { //new scope runs this code in all constructors
+        setRank(_rank); //to load the attachments for online players
+    }
+
     /**
      * Fills this offline player with a previous one (used in {@link TownyPlayer#TownyPlayer(Player, StorageFolder, OfflineTownyPlayer)})
      *
