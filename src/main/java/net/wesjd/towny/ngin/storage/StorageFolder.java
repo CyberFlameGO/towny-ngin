@@ -117,25 +117,27 @@ public class StorageFolder {
      */
     public void unbox(String name, Object packable) throws PackException {
         try {
-            MessageUnpacker unpacker = MessagePack.newDefaultUnpacker(new FileInputStream(new File(_folder, name)));
+            File file = new File(_folder, name);
+            if(file.exists()) {
+                MessageUnpacker unpacker = MessagePack.newDefaultUnpacker(new FileInputStream());
 
-            List<Field> fields = _fieldCache.get(packable.getClass());
+                List<Field> fields = _fieldCache.get(packable.getClass());
 
-            int amount = unpacker.unpackArrayHeader();
-            for (int i = 0; i < amount; i++) {
-                String field = unpacker.unpackString();
-                Field f = findField(fields, field)
-                        .orElseGet(() -> {
-                    _towny.getLogger().warning("Unable to find field "+field+" in "+packable.getClass());
-                    return null;
-                });
-                if (f != null) {
-                    if(unpacker.unpackBoolean()) 
-                        f.set(packable, _packerStore.lookup(f.getType())
-                                .orElseThrow(() -> new PackException("Unable to find packer for type " + f.getType())).unbox(unpacker));
+                int amount = unpacker.unpackArrayHeader();
+                for (int i = 0; i < amount; i++) {
+                    String field = unpacker.unpackString();
+                    Field f = findField(fields, field)
+                            .orElseGet(() -> {
+                                _towny.getLogger().warning("Unable to find field " + field + " in " + packable.getClass());
+                                return null;
+                            });
+                    if (f != null) {
+                        if (unpacker.unpackBoolean())
+                            f.set(packable, _packerStore.lookup(f.getType())
+                                    .orElseThrow(() -> new PackException("Unable to find packer for type " + f.getType())).unbox(unpacker));
+                    }
                 }
             }
-
         } catch (IOException | ExecutionException | IllegalAccessException e) {
             throw new PackException("Unboxing " + packable.getClass(), e);
         }
