@@ -2,6 +2,7 @@ package net.wesjd.towny.ngin.player;
 
 import net.wesjd.towny.ngin.storage.Data;
 import net.wesjd.towny.ngin.storage.StorageFolder;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 import java.util.UUID;
@@ -25,7 +26,7 @@ public class OfflineTownyPlayer {
      * The amount of money the player has
      */
     @Data
-    private long _money = 0;
+    private double _money = 0;
     /**
      * The player's {@link Rank}
      */
@@ -66,11 +67,19 @@ public class OfflineTownyPlayer {
         return _uuid;
     }
 
-    public long getMoney() {
+    public double getMoney() {
         return _money;
     }
 
-    public void setMoney(long money) {
+    public void removeMoney(double amount) {
+        setMoney(getMoney() - amount);
+    }
+
+    public void addMoney(double amount) {
+        setMoney(getMoney() + amount);
+    }
+
+    public void setMoney(double money) {
         _money = money;
     }
 
