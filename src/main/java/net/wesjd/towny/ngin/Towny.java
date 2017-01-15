@@ -14,6 +14,7 @@ import org.bukkit.Location;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.io.File;
 import java.util.Arrays;
 
 public class Towny extends JavaPlugin {
@@ -33,6 +34,7 @@ public class Towny extends JavaPlugin {
     @Override
     public void onEnable() {
         getDataFolder().mkdirs();
+        new File(getDataFolder(), "permissions").mkdirs();
         registerListeners(JoinLeaveListener.class);
 
         TownManager instance = _injector.getInstance(TownManager.class);

@@ -104,7 +104,6 @@ public class StorageFolder {
             packer.close();
 
             FileUtils.copyInputStreamToFile(new ByteArrayInputStream(packer.toByteArray()), new File(_folder, name));
-
         } catch (IOException | ExecutionException e) {
             throw new PackException("Packing " + packable.getClass(), e);
         }
