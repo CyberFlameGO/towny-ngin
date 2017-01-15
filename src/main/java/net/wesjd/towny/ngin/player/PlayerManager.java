@@ -6,6 +6,7 @@ import com.google.common.cache.LoadingCache;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 import net.wesjd.towny.ngin.storage.StorageFolder;
+import net.wesjd.towny.ngin.util.UUIDFetcher;
 import org.apache.commons.lang.Validate;
 import org.bukkit.entity.Player;
 
@@ -40,7 +41,7 @@ public class PlayerManager {
             .build(new CacheLoader<String, UUID>() {
                 @Override
                 public UUID load(String key) throws Exception {
-                    return UUID.fromString(key);
+                    return UUIDFetcher.getUUIDOf(key);
                 }
             });
 
