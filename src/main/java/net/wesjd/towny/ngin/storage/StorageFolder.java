@@ -88,7 +88,11 @@ public class StorageFolder {
                 Packer p = _packerStore.lookup(field.getType()).orElseThrow(() -> new PackException("Unable to find packer for type " + field.getType()));
                 try {
                     packer.packString(field.getName());
-                    p.packup(field.get(packable), packer);
+                    Object obj = field.get(packable);
+
+                    packer.packBoolean(obj != null); //signifies whether a field has data
+                    if(obj != null)
+                        p.packup(obj, packer);
                 } catch (IOException | IllegalAccessException e) {
                     e.printStackTrace();
                 }
@@ -127,9 +131,12 @@ public class StorageFolder {
                                 _towny.getLogger().warning("Unable to find field " + field + " in " + packable.getClass());
                                 return null;
                             });
-                    if (f != null)
-                        f.set(packable, _packerStore.lookup(f.getType())
-                                .orElseThrow(() -> new PackException("Unable to find packer for type " + f.getType())).unbox(unpacker));
+                    if (f != null) {
+                        boolean isNull = unpacker.unpackBoolean();
+                        Object read = isNull ? null : _packerStore.lookup(f.getType())
+                                .orElseThrow(() -> new PackException("Unable to find packer for type " + f.getType())).unbox(unpacker);
+                        f.set(packable, read);
+                    }
                 }
             }
         } catch (IOException | ExecutionException | IllegalAccessException e) {
