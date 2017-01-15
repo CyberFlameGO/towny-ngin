@@ -52,5 +52,4 @@ public class JoinLeaveListener implements Listener {
 
         _playerManager.removePlayer(e.getPlayer());
     }
-
 }
