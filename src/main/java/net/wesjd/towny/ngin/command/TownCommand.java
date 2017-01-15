@@ -12,36 +12,47 @@ import net.wesjd.towny.ngin.town.TownManager;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 
+/**
+ * Contains all subcommands for the /town command
+ */
 public class TownCommand {
 
+    /**
+     * An injected town manager
+     */
     @Inject
     private TownManager _townManager;
-
+    /**
+     * An injected player manager
+     */
     @Inject
     private PlayerManager _playerManager;
 
-    @Command(aliases = "createtown", usage = "<townname>", desc = "Creates a new town", min = 1)
-    public void createTownCommand(@Sender Player player, @Validate(regex = "^(\\w{1,16})$") String name) {
-        Town town = _townManager.addTown(name);
-        if (town == null) player.sendMessage(ChatColor.RED + "A town with the name " + name + " already exists");
+    @Command(aliases = "create", usage = "<town name>", desc = "Creates a new town", min = 1)
+    public void createTownCommand(@Sender TownyPlayer player, @Validate(regex = "^(\\w{1,16})$") String name) {
+        if (_townManager.getTownSafely(name).isPresent()) player.message(ChatColor.RED + "A town with the name " + name + " already exists");
         else {
-            town.generateDefaultRanks();
-            TownData data = new TownData(town.getTownName(), town.getRankByName("mayor").orElseThrow(() -> new RuntimeException("Unable to find Mayor rank")));
-            _playerManager.getPlayer(player).setTownData(data);
-            player.sendMessage(ChatColor.GREEN + "Created the " + name + " town!");
+            final Town newTown = _townManager.createTown(name);
+            newTown.generateDefaultRanks();
+            _townManager.addTown(newTown);
+
+            TownData data = new TownData(newTown.getTownName(), newTown.getRankByName("mayor").orElseThrow(() -> new RuntimeException("Unable to find Mayor rank")));
+            player.setTownData(data);
+
+            player.message(ChatColor.GREEN + "Created the " + name + " town!");
         }
     }
 
-    @Command(aliases = "info", desc = "Tells you what town you're apart of and your rank")
-    public void getTownInfo(@Sender Player player) {
-        TownyPlayer tPlayer = _playerManager.getPlayer(player);
-        if (tPlayer.getTownData() == null) player.sendMessage(ChatColor.RED + "You aren't apart of any town!");
+    @Command(aliases = "info", desc = "Shows your town info")
+    public void getTownInfo(@Sender TownyPlayer player) {
+        if (player.getTownData() == null) player.message(ChatColor.RED + "You aren't apart of any town!");
         else {
-            TownData data = tPlayer.getTownData();
-            player.sendMessage(ChatColor.YELLOW + "You are apart of the " + data.getTown() + " town, and you are " + data.getTownRank().getDisplay());
-            Town town = _townManager.getTown(data.getTown())
-                    .orElseThrow(() -> new RuntimeException("Unable to find town " + data.getTown() + " for player " + player.getName()));
-            player.sendMessage(ChatColor.YELLOW + "Your town has $" + town.getMoney() + " and the following warps: " + town.getWarps().keySet());
+            final TownData data = player.getTownData();
+            final Town town = _townManager.getTown(data.getTownName());
+            player.message(ChatColor.YELLOW + "----- [ About " + ChatColor.GREEN + data.getTownName() + ChatColor.YELLOW + " ] -----");
+            player.message(ChatColor.YELLOW + "Your rank: " + ChatColor.RED + data.getTownRank().getDisplay());
+            player.message(ChatColor.YELLOW + "Town money: " + ChatColor.RED + "$" + town.getMoney());
+            player.message(ChatColor.YELLOW + "Warps: " + ChatColor.RED + String.join(", ", town.getWarps().keySet()));
         }
     }
 
@@ -57,9 +68,8 @@ public class TownCommand {
 
         TownyPlayer tPlayer = _playerManager.getPlayer(player);
         TownData data = tPlayer.getTownData();
-        player.sendMessage(ChatColor.YELLOW + "You are apart of the " + data.getTown() + " town, and you are " + data.getTownRank().getDisplay());
-        Town town = _townManager.getTown(data.getTown())
-                .orElseThrow(() -> new RuntimeException("Unable to find town " + data.getTown() + " for player " + player.getName()));
+        player.sendMessage(ChatColor.YELLOW + "You are apart of the " + data.getTownName() + " town, and you are " + data.getTownRank().getDisplay());
+        Town town = _townManager.getTown(data.getTownName());
         player.sendMessage(ChatColor.YELLOW + "Your town has $" + town.getMoney() + " and the following warps: " + town.getWarps().keySet());
     }
 }

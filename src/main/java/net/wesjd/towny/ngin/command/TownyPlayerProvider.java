@@ -16,6 +16,9 @@ import java.lang.annotation.Annotation;
 import java.util.Collections;
 import java.util.List;
 
+/**
+ * Provides a TownyPlayer for the @Sender annotation
+ */
 public class TownyPlayerProvider implements Provider<TownyPlayer> {
 
     private final Translator _translator;

@@ -10,7 +10,7 @@ public class TownData {
         this._townRank = _townRank;
     }
 
-    public String getTown() {
+    public String getTownName() {
         return _town;
     }
 

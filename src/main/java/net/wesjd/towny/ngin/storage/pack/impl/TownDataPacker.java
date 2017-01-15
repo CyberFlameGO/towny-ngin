@@ -18,7 +18,7 @@ public class TownDataPacker extends Packer<TownData> {
 
     @Override
     public void packup(TownData packing, MessagePacker packer) throws IOException {
-        String town = packing.getTown() == null ? "~" : packing.getTown();
+        String town = packing.getTownName() == null ? "~" : packing.getTownName();
         TownRank townRank = packing.getTownRank() == null ? new TownRank("~", "~", new ArrayList<>()) : packing.getTownRank();
         packer.packString(town);
         getRankPacker().packup(townRank, packer);

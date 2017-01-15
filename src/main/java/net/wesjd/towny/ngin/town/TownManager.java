@@ -22,18 +22,28 @@ public class TownManager {
         _towns.clear();
         Arrays.stream(_storage.getAllFiles())
                 .map(File::getName)
+                .map(this::createTown)
                 .forEach(this::addTown);
 
         _towns.forEach(Town::load);
     }
 
-    public Town addTown(String name) {
-        Town t = new Town(name.toLowerCase(), _storage);
-        return _towns.add(t) ? t : null;
+    public Town createTown(String name) {
+        return new Town(name, _storage);
     }
 
-    public Optional<Town> getTown(String name) {
-        return _towns.stream().filter(t -> t.getTownName().equalsIgnoreCase(name)).findFirst();
+    public void addTown(Town town) {
+        _towns.add(town);
+    }
+
+    public Optional<Town> getTownSafely(String name) {
+        return Optional.ofNullable(getTown(name));
+    }
+
+    public Town getTown(String name) {
+        return _towns.stream()
+                .filter(t -> t.getTownName().equalsIgnoreCase(name))
+                .findFirst().orElse(null);
     }
 
     public Collection<Town> getTowns() {

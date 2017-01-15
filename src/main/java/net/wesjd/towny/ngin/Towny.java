@@ -4,13 +4,9 @@ import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.Singleton;
-<<<<<<< HEAD
-=======
 import li.l1t.common.intake.provider.annotation.Sender;
 import net.milkbowl.vault.economy.Economy;
->>>>>>> master
 import li.l1t.common.intake.CommandsManager;
-import net.milkbowl.vault.economy.Economy;
 import net.wesjd.towny.ngin.command.TestCommand;
 import net.wesjd.towny.ngin.command.TownCommand;
 import net.wesjd.towny.ngin.command.TownyPlayerProvider;
