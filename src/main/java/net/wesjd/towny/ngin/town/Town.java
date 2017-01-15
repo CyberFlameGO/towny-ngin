@@ -29,8 +29,7 @@ public class Town {
     @Data
     private List<TownRank> _ranks = new ArrayList<>();
 
-
-    public Town(String name, StorageFolder storage) {
+    Town(String name, StorageFolder storage) {
         _townName = name;
         _storage = storage;
     }

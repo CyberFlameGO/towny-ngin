@@ -40,6 +40,15 @@ public class TownyPlayer extends OfflineTownyPlayer {
         rank.getPermissions().forEach(perm -> _attachment.setPermission(perm, true));
     }
 
+    /**
+     * Send the player a message
+     *
+     * @param message The message to send the player
+     */
+    public void message(String message) {
+        _wrapped.sendMessage(message);
+    }
+
     public Player getWrapped() {
         return _wrapped;
     }
