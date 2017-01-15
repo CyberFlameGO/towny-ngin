@@ -119,7 +119,7 @@ public class StorageFolder {
         try {
             File file = new File(_folder, name);
             if(file.exists()) {
-                MessageUnpacker unpacker = MessagePack.newDefaultUnpacker(new FileInputStream());
+                MessageUnpacker unpacker = MessagePack.newDefaultUnpacker(new FileInputStream(file));
 
                 List<Field> fields = _fieldCache.get(packable.getClass());
 
