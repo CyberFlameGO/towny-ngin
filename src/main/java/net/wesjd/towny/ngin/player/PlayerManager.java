@@ -30,7 +30,7 @@ public class PlayerManager {
     /**
      * {@link UUID} to {@link TownyPlayer} store
      */
-    private final Map<UUID, TownyPlayer> store = new HashMap<>();
+    private final Map<UUID, TownyPlayer> _store = new HashMap<>();
 
     /**
      * A simple name to uuid cache
@@ -75,8 +75,8 @@ public class PlayerManager {
      * @param player The {@link Player} to create a wrapper for
      */
     public TownyPlayer initializePlayer(Player player, OfflineTownyPlayer offline) {
-        Validate.isTrue(!store.containsKey(offline.getUuid()));
-        return store.put(offline.getUuid(), new TownyPlayer(player, _storage, offline));
+        Validate.isTrue(!_store.containsKey(offline.getUuid()));
+        return _store.put(offline.getUuid(), new TownyPlayer(player, _storage, offline));
     }
 
     /**
@@ -86,7 +86,17 @@ public class PlayerManager {
      * @return The wrapper
      */
     public TownyPlayer getPlayer(Player player) {
-        return store.get(player.getUniqueId());
+        return _store.get(player.getUniqueId());
+    }
+
+    /**
+     * Gets an online player's {@link TownyPlayer} wrapper
+     *
+     * @param uuid The {@link UUID} to get the wrapper for
+     * @return The wrapper
+     */
+    public TownyPlayer getPlayer(UUID uuid) {
+        return _store.get(uuid);
     }
 
     /**
@@ -95,7 +105,7 @@ public class PlayerManager {
      * @param player The {@link Player} to remove
      */
     public void removePlayer(Player player) {
-        store.remove(player.getUniqueId()).save();
+        _store.remove(player.getUniqueId()).save();
     }
 
 }

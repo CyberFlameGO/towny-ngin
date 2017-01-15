@@ -8,6 +8,7 @@ import net.wesjd.towny.ngin.player.PlayerManager;
 
 import java.text.NumberFormat;
 import java.util.List;
+import java.util.UUID;
 
 /**
  * Simple injection of our custom economy in vault
@@ -58,8 +59,16 @@ public class EconomyInjection extends AbstractEconomy {
     @Override
     public EconomyResponse depositPlayer(String playerName, double amount) {
         if(amount < 0) return new EconomyResponse(0, 0, EconomyResponse.ResponseType.FAILURE, "Can't deposit negative");
-        final OfflineTownyPlayer player = _playerManager.createOfflineTownyPlayer(_playerManager.getUUIDFor(playerName));
+
+        final UUID playerUuid = _playerManager.getUUIDFor(playerName);
+        OfflineTownyPlayer player = _playerManager.getPlayer(playerUuid);
+        boolean createdOffline = false;
+        if(player == null) {
+            player = _playerManager.createOfflineTownyPlayer(playerUuid);
+            createdOffline = true;
+        }
         player.addMoney(amount);
+        if(createdOffline) player.save();
         return new EconomyResponse(amount, player.getMoney(), EconomyResponse.ResponseType.SUCCESS, "none");
     }
 
