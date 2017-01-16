@@ -47,11 +47,14 @@ public class StorageFolder {
             .build(new CacheLoader<Class, List<Field>>() {
                 @Override
                 public List<Field> load(Class key) throws Exception {
-                    return Arrays.stream(key.getDeclaredFields())
+
+                    List<Field> fields = Arrays.stream(key.getDeclaredFields())
                             .filter(f -> !Modifier.isStatic(f.getModifiers()))
                             .filter(f -> f.isAnnotationPresent(Data.class))
                             .peek(f -> f.setAccessible(true))
                             .collect(Collectors.toList());
+                    if(key.getSuperclass() != Object.class) fields.addAll(_fieldCache.get(key.getSuperclass()));
+                    return fields;
                 }
             });
 
@@ -118,7 +121,7 @@ public class StorageFolder {
         try {
             File file = new File(_folder, name);
             if(file.exists()) {
-                MessageUnpacker unpacker = MessagePack.newDefaultUnpacker(new FileInputStream());
+                MessageUnpacker unpacker = MessagePack.newDefaultUnpacker(new FileInputStream(file));
 
                 List<Field> fields = _fieldCache.get(packable.getClass());
 
