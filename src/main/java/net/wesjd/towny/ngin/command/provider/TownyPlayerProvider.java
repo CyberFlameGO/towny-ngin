@@ -1,4 +1,4 @@
-package net.wesjd.towny.ngin.command;
+package net.wesjd.towny.ngin.command.provider;
 
 import com.sk89q.intake.argument.ArgumentException;
 import com.sk89q.intake.argument.CommandArgs;
@@ -16,10 +16,7 @@ import java.lang.annotation.Annotation;
 import java.util.Collections;
 import java.util.List;
 
-/**
- * Provides a TownyPlayer for the @Sender annotation
- */
-public class TownyPlayerProvider implements Provider<TownyPlayer> {
+public class TownyPlayerProvider extends BaseProvider<TownyPlayer> {
 
     private final Translator _translator;
     private final PlayerManager _playerManager;
@@ -29,22 +26,12 @@ public class TownyPlayerProvider implements Provider<TownyPlayer> {
         _playerManager = playerManager;
     }
 
-    @Override
-    public boolean isProvided() {
-        return true;
-    }
-
     @Nullable
     @Override
     public TownyPlayer get(CommandArgs arguments, List<? extends Annotation> list) throws ArgumentException, ProvisionException {
         final CommandSender sender = arguments.getNamespace().get(CommandSender.class);
         if(!(sender instanceof Player)) throw new CommandExitMessage(_translator.translate("PlayerOnlyCommand"));
         return _playerManager.getPlayer((Player) sender);
-    }
-
-    @Override
-    public List<String> getSuggestions(String s) {
-        return Collections.emptyList();
     }
 
 }

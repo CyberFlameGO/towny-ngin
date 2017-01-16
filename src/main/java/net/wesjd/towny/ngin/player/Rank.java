@@ -10,7 +10,9 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Represents rank values on the server
@@ -34,7 +36,7 @@ public enum Rank {
     /**
      * Contains all the permissions for this rank
      */
-    private final List<Permission> _permissions = new ArrayList<>();
+    private final Set<Permission> _permissions = new HashSet<>();
 
     Rank(String prefix, ChatColor color) {
         this._prefix = prefix;
@@ -46,7 +48,6 @@ public enum Rank {
 
             final File permissionsFile = new File(permissionsFolder, toString().toLowerCase());
             if (!permissionsFile.exists()) permissionsFile.createNewFile();
-
             Files.readLines(permissionsFile, StandardCharsets.UTF_8).forEach(line -> _permissions.add(new Permission(line)));
         } catch (IOException ex) {
             ex.printStackTrace();
@@ -61,7 +62,7 @@ public enum Rank {
         return _color;
     }
 
-    public List<Permission> getPermissions() {
+    public Set<Permission> getPermissions() {
         return _permissions;
     }
 
