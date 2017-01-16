@@ -21,7 +21,7 @@ public class TownManager {
     /**
      * A hashmap of all the current {@link Town}s, used to save on lookup times
      */
-    private final HashMap<String, Town> _towns = new HashMap<>();
+    private final Map<String, Town> _towns = new HashMap<>();
 
     /**
      * Saves all the currently stored towns

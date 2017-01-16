@@ -13,12 +13,12 @@ public class DefaultRank extends TownRank {
     /**
      * Creates a new default rank
      *
-     * @param name        The internal name
-     * @param display     The name players will see
+     * @param internalName        The internal name
+     * @param displayName     The name players will see
      * @param permissions The permissions this rank has
      */
-    public DefaultRank(String name, String display, List<Permission> permissions) {
-        super(name, display, permissions);
+    public DefaultRank(String internalName, String displayName, List<Permission> permissions) {
+        super(internalName, displayName, permissions);
     }
 
     @Override

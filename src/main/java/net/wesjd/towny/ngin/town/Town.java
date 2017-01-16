@@ -1,5 +1,6 @@
 package net.wesjd.towny.ngin.town;
 
+import net.wesjd.towny.ngin.player.TownyPlayer;
 import net.wesjd.towny.ngin.storage.Data;
 import net.wesjd.towny.ngin.storage.StorageFolder;
 import net.wesjd.towny.ngin.town.ranks.DefaultRank;
@@ -59,7 +60,7 @@ public class Town {
      * The ranks that the town has
      */
     @Data
-    private List<TownRank> _ranks = new ArrayList<>();
+    private Set<TownRank> _ranks = new HashSet<>();
 
     /**
      * Creates a new town with the specified name and folder it's located in
@@ -104,8 +105,19 @@ public class Town {
         return _name;
     }
 
-    public void setTownName(String townName) {
+    public void setName(String townName) {
         _name = townName;
+    }
+
+    /**
+     * Gets a player's town rank
+     *
+     * @param player The player to find the rank of
+     * @return The player's rank
+     * @throws RuntimeException If there was some weird error
+     */
+    public TownRank getTownRankFor(TownyPlayer player) {
+        return getRank(_playerRanks.get(player.getUuid())).orElseThrow(() -> new RuntimeException("Unable to find player's rank."));
     }
 
     /**
@@ -125,9 +137,10 @@ public class Town {
     /**
      * Generates the generic set of ranks all towns have
      */
-    public void generateDefaultRanks() {
-        _ranks.add(new OwnerRank("mayor", "Mayor"));
-        _ranks.add(new DefaultRank("member", "Town Member", Collections.emptyList()));
+    public void generateDefaultRanks(TownyPlayer townOwner) {
+        _ranks.add(new OwnerRank("owner", "Mayor"));
+        _ranks.add(new DefaultRank("member", "Member", Collections.emptyList()));
+        _playerRanks.put(townOwner.getUuid(), "owner");
     }
 
     /**
@@ -136,8 +149,10 @@ public class Town {
      * @param name The name of the rank
      * @return An {@link Optional<TownRank>} empty if no rank found
      */
-    public Optional<TownRank> getRankByName(String name) {
-        return _ranks.stream().filter(r -> r.getName().equalsIgnoreCase(name)).findFirst();
+    public Optional<TownRank> getRank(String name) {
+        return _ranks.stream()
+                .filter(r -> r.getInternalName().equals(name))
+                .findFirst();
     }
 
     @Override

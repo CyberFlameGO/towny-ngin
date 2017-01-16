@@ -12,10 +12,10 @@ public class OwnerRank extends DefaultRank {
     /**
      * Creates a new owner rank
      *
-     * @param name        The internal name
-     * @param display     The name players will see
+     * @param internalName        The internal name
+     * @param displayName     The name players will see
      */
-    public OwnerRank(String name, String display) {
-        super(name, display, Collections.singletonList(new Permission("towny.owner")));
+    public OwnerRank(String internalName, String displayName) {
+        super(internalName, displayName, Collections.singletonList(new Permission("towny.owner")));
     }
 }

@@ -16,8 +16,8 @@ public class TownRankPacker extends Packer<TownRank> {
     @Override
     public void packup(TownRank packing, MessagePacker packer) throws IOException {
 
-        packer.packString(packing.getName());
-        packer.packString(packing.getDisplay());
+        packer.packString(packing.getInternalName());
+        packer.packString(packing.getDisplayName());
         packer.packByte((byte) (packing instanceof OwnerRank ? 1 : packing instanceof DefaultRank ? 2 : 0));
 
         packer.packArrayHeader(packing.getPermissions().size());

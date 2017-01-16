@@ -12,11 +12,11 @@ public class TownRank {
     /**
      * The rank's internal name
      */
-    private String _name;
+    private String _internalName;
     /**
      * What players will see in chat
      */
-    private String _display;
+    private String _displayName;
     /**
      * The permissions this rank has
      */
@@ -25,22 +25,22 @@ public class TownRank {
     /**
      * Creates a new town rank
      *
-     * @param name The internal name
+     * @param internalName The internal name
      * @param display The name players will see
      * @param permissions The permissions this rank has
      */
-    public TownRank(String name, String display, List<Permission> permissions) {
-        _name = name;
-        _display = display;
+    public TownRank(String internalName, String display, List<Permission> permissions) {
+        _internalName = internalName;
+        _displayName = display;
         _permissions = permissions;
     }
 
-    public String getName() {
-        return _name;
+    public String getInternalName() {
+        return _internalName;
     }
 
-    public String getDisplay() {
-        return _display;
+    public String getDisplayName() {
+        return _displayName;
     }
 
     public List<Permission> getPermissions() {
@@ -54,8 +54,8 @@ public class TownRank {
     @Override
     public String toString() {
         final StringBuilder sb = new StringBuilder("TownRank{");
-        sb.append("_name='").append(_name).append('\'');
-        sb.append(", _display='").append(_display).append('\'');
+        sb.append("_name='").append(_internalName).append('\'');
+        sb.append(", _display='").append(_displayName).append('\'');
         sb.append(", _permissions=").append(_permissions);
         sb.append('}');
         return sb.toString();
