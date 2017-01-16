@@ -45,9 +45,9 @@ public class TownCommand {
 
     @Command(aliases = "info", desc = "Shows your town info")
     public void getTownInfo(@Sender TownyPlayer player) {
-        if (player.getTownData() == null) player.message(ChatColor.RED + "You aren't apart of any town!");
+        if (player.getTownyName() == null) player.message(ChatColor.RED + "You aren't apart of any town!");
         else {
-            final TownData data = player.getTownData();
+            final TownData data = player.getTownyName();
             final Town town = _townManager.getTown(data.getTownName());
             player.message(ChatColor.YELLOW + "----- [ About " + ChatColor.GREEN + data.getTownName() + ChatColor.YELLOW + " ] -----");
             player.message(ChatColor.YELLOW + "Your rank: " + ChatColor.RED + data.getTownRank().getDisplay());
@@ -67,7 +67,7 @@ public class TownCommand {
         _townManager.loadTowns();
 
         TownyPlayer tPlayer = _playerManager.getPlayer(player);
-        TownData data = tPlayer.getTownData();
+        TownData data = tPlayer.getTownyName();
         player.sendMessage(ChatColor.YELLOW + "You are apart of the " + data.getTownName() + " town, and you are " + data.getTownRank().getDisplay());
         Town town = _townManager.getTown(data.getTownName());
         player.sendMessage(ChatColor.YELLOW + "Your town has $" + town.getMoney() + " and the following warps: " + town.getWarps().keySet());

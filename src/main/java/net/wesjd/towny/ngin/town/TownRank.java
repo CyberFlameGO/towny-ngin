@@ -47,6 +47,10 @@ public class TownRank {
         return _permissions;
     }
 
+    public boolean isDeletable() {
+        return false;
+    }
+
     @Override
     public String toString() {
         final StringBuilder sb = new StringBuilder("TownRank{");

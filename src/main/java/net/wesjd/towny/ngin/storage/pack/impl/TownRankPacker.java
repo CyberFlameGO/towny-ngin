@@ -1,6 +1,8 @@
 package net.wesjd.towny.ngin.storage.pack.impl;
 
 import net.wesjd.towny.ngin.storage.pack.Packer;
+import net.wesjd.towny.ngin.town.ranks.DefaultRank;
+import net.wesjd.towny.ngin.town.ranks.OwnerRank;
 import net.wesjd.towny.ngin.town.TownRank;
 import org.bukkit.permissions.Permission;
 import org.msgpack.core.MessagePacker;
@@ -16,6 +18,7 @@ public class TownRankPacker extends Packer<TownRank> {
 
         packer.packString(packing.getName());
         packer.packString(packing.getDisplay());
+        packer.packByte((byte) (packing instanceof OwnerRank ? 1 : packing instanceof DefaultRank ? 2 : 0));
 
         packer.packArrayHeader(packing.getPermissions().size());
         for (Permission p : packing.getPermissions())
@@ -26,6 +29,7 @@ public class TownRankPacker extends Packer<TownRank> {
     public TownRank unbox(MessageUnpacker unpacker) throws IOException {
 
         String name = unpacker.unpackString(), display = unpacker.unpackString();
+        byte rankType = unpacker.unpackByte();
 
         int size = unpacker.unpackArrayHeader();
 
@@ -34,6 +38,13 @@ public class TownRankPacker extends Packer<TownRank> {
         for (int i = 0; i < size; i++)
             permissions.add(new Permission(unpacker.unpackString()));
 
-        return new TownRank(name, display, permissions);
+        switch (rankType) {
+            case 1:
+                return new OwnerRank(name, display);
+            case 2:
+                return new DefaultRank(name, display, permissions);
+            default:
+                return new TownRank(name, display, permissions);
+        }
     }
 }
