@@ -1,5 +1,6 @@
 package net.wesjd.towny.ngin.town.ranks;
 
+import net.wesjd.towny.ngin.storage.InheritSuperPacker;
 import net.wesjd.towny.ngin.town.TownPermissions;
 import org.bukkit.permissions.Permission;
 
@@ -8,6 +9,7 @@ import java.util.Collections;
 /**
  * An non-removable rank that has all permissions for towns
  */
+@InheritSuperPacker
 public class OwnerRank extends DefaultRank {
 
     /**

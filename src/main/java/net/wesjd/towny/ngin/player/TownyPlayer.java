@@ -27,8 +27,8 @@ public class TownyPlayer extends OfflineTownyPlayer {
      * @param storage The supplied {@link StorageFolder}
      * @param offline The previously loaded {@link OfflineTownyPlayer}
      */
-    TownyPlayer(Player wrapped, StorageFolder storage, TownManager townManager, OfflineTownyPlayer offline) {
-        super(storage, offline, townManager);
+    TownyPlayer(Player wrapped, StorageFolder storage, OfflineTownyPlayer offline) {
+        super(storage, offline);
         _wrapped = wrapped;
         _attachment = new PermissionAttachment(Bukkit.getPluginManager().getPlugin("ngin"), _wrapped);
         setLastKnownName(wrapped.getName());

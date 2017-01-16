@@ -34,7 +34,6 @@ public class TownManager {
      * Loads all the stored towns from the towns folder
      */
     public void loadTowns() {
-        System.out.println("loading towns");
         _towns.clear();
         Arrays.stream(_storage.getAllFiles())
                 .map(File::getName)
@@ -84,9 +83,5 @@ public class TownManager {
 
     public Collection<Town> getTowns() {
         return _towns.values();
-    }
-
-    public Map<String, Town> TEMP_removeMe() {
-        return _towns;
     }
 }

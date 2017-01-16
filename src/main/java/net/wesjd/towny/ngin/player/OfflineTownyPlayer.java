@@ -51,11 +51,11 @@ public class OfflineTownyPlayer {
     private String _townName;
 
     /**
-     * Fills this offline player with a previous one (used in {@link TownyPlayer#TownyPlayer(Player, StorageFolder, TownManager, OfflineTownyPlayer)})
+     * Fills this offline player with a previous one (used in {@link TownyPlayer#TownyPlayer(Player, StorageFolder, OfflineTownyPlayer)})
      *
      * @param fill The offline player to fill from
      */
-    protected OfflineTownyPlayer(StorageFolder storage, OfflineTownyPlayer fill, TownManager townManager) {
+    protected OfflineTownyPlayer(StorageFolder storage, OfflineTownyPlayer fill) {
         _storage = storage;
         _uuid = fill.getUuid();
         _town = fill.getTown();
@@ -63,8 +63,7 @@ public class OfflineTownyPlayer {
         _rank = fill.getRank();
         _lastKnownName = fill.getLastKnownName();
         _townName = fill._townName;
-        _town = townManager.getTown(_townName);
-        System.out.println("Getting town: "+_townName+" got: "+_town+" towns: " + townManager.TEMP_removeMe());
+        _town = fill.getTown();
     }
 
     /**
