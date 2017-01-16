@@ -91,7 +91,10 @@ public class StorageFolder {
             packer.packArrayHeader(fields.size());
 
             for (Field field : fields) {
-                Packer p = _packerStore.lookup(field.getType()).orElseThrow(() -> new PackException("Unable to find packer for type " + field.getType()));
+                Class cl = field.getType();
+                while (cl.isAnnotationPresent(InheritSuperPacker.class)) cl = cl.getSuperclass();
+
+                Packer p = _packerStore.lookup(cl).orElseThrow(() -> new PackException("Unable to find packer for type " + field.getType()));
                 try {
                     packer.packString(field.getName());
                     Object obj = field.get(packable);
@@ -138,9 +141,13 @@ public class StorageFolder {
                                 return null;
                             });
                     if (f != null) {
-                        if (unpacker.unpackBoolean())
-                            f.set(packable, _packerStore.lookup(f.getType())
+                        if (unpacker.unpackBoolean()) {
+                            Class cl = f.getType();
+                            while (cl.isAnnotationPresent(InheritSuperPacker.class)) cl = cl.getSuperclass();
+
+                            f.set(packable, _packerStore.lookup(cl)
                                     .orElseThrow(() -> new PackException("Unable to find packer for type " + f.getType())).unbox(unpacker));
+                        }
                     }
                 }
             }

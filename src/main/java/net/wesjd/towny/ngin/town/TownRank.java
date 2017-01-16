@@ -47,6 +47,10 @@ public class TownRank {
         return _permissions;
     }
 
+    public boolean hasPermission(Permission permission) {
+        return _permissions.stream().anyMatch(p -> p.getName().equalsIgnoreCase(permission.getName()));
+    }
+
     public boolean isDeletable() {
         return false;
     }

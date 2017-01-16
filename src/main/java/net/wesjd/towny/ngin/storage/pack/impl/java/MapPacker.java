@@ -1,6 +1,7 @@
 package net.wesjd.towny.ngin.storage.pack.impl.java;
 
 import com.google.inject.Inject;
+import net.wesjd.towny.ngin.storage.InheritSuperPacker;
 import net.wesjd.towny.ngin.storage.pack.Packer;
 import net.wesjd.towny.ngin.storage.pack.PackerStore;
 import org.msgpack.core.MessagePacker;
@@ -25,8 +26,12 @@ public class MapPacker extends Packer<Map> {
             if (keyPacker == null) {
                 Class key = entry.getKey().getClass(), value = entry.getValue().getClass();
 
-                keyPacker = _packerStore.lookup(key).orElseThrow(() -> new RuntimeException("Unable to find packer key type " + key));
-                valuePacker = _packerStore.lookup(value).orElseThrow(() -> new RuntimeException("Unable to find packer for value type " + value));
+                while (key.isAnnotationPresent(InheritSuperPacker.class)) key = key.getSuperclass();
+                while (value.isAnnotationPresent(InheritSuperPacker.class)) value = value.getSuperclass();
+
+                Class finalKey = key, finalValue = value;
+                keyPacker = _packerStore.lookup(key).orElseThrow(() -> new RuntimeException("Unable to find packer key type " + finalKey));
+                valuePacker = _packerStore.lookup(value).orElseThrow(() -> new RuntimeException("Unable to find packer for value type " + finalValue));
 
                 packer.packString(key.getName());
                 packer.packString(value.getName());

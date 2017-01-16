@@ -1,5 +1,6 @@
 package net.wesjd.towny.ngin.town.ranks;
 
+import net.wesjd.towny.ngin.storage.InheritSuperPacker;
 import net.wesjd.towny.ngin.town.TownRank;
 import org.bukkit.permissions.Permission;
 import net.wesjd.towny.ngin.town.Town;
@@ -9,6 +10,7 @@ import java.util.List;
 /**
  * An non-removable rank that represents the beginning rank in a {@link Town}
  */
+@InheritSuperPacker
 public class DefaultRank extends TownRank {
     /**
      * Creates a new default rank

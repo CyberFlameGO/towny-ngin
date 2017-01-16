@@ -1,5 +1,6 @@
 package net.wesjd.towny.ngin.town.ranks;
 
+import net.wesjd.towny.ngin.town.TownPermissions;
 import org.bukkit.permissions.Permission;
 
 import java.util.Collections;
@@ -16,6 +17,11 @@ public class OwnerRank extends DefaultRank {
      * @param displayName     The name players will see
      */
     public OwnerRank(String internalName, String displayName) {
-        super(internalName, displayName, Collections.singletonList(new Permission("towny.owner")));
+        super(internalName, displayName, Collections.singletonList(TownPermissions.TOWN_ALL));
+    }
+
+    @Override
+    public boolean hasPermission(Permission permission) {
+        return true;
     }
 }

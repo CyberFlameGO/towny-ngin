@@ -4,12 +4,13 @@ import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.Singleton;
+import li.l1t.common.intake.CommandsManager;
 import li.l1t.common.intake.provider.annotation.Sender;
 import net.milkbowl.vault.economy.Economy;
-import li.l1t.common.intake.CommandsManager;
 import net.wesjd.towny.ngin.command.PermissionsCommand;
 import net.wesjd.towny.ngin.command.TestCommand;
 import net.wesjd.towny.ngin.command.TownCommand;
+import net.wesjd.towny.ngin.command.WarpCommand;
 import net.wesjd.towny.ngin.command.provider.RankProvider;
 import net.wesjd.towny.ngin.command.provider.TownyPlayerProvider;
 import net.wesjd.towny.ngin.listeners.JoinLeaveListener;
@@ -25,6 +26,7 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.ServicePriority;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.io.File;
 import java.util.Arrays;
 import java.util.Locale;
 
@@ -38,6 +40,7 @@ public class Towny extends JavaPlugin {
                     bind(Towny.class).toInstance(Towny.this);
 
                     bind(PlayerManager.class).in(Singleton.class);
+                    bind(TownManager.class).in(Singleton.class);
 
                     bind(PermissionsCommand.class);
                 }
@@ -59,7 +62,8 @@ public class Towny extends JavaPlugin {
             commandsManager.bind(Rank.class)
                     .toProvider(new RankProvider());
             commandsManager.registerCommand(new TestCommand(), "test");
-            commandsManager.registerCommand(new TownCommand(), "town");
+            commandsManager.registerCommand(new WarpCommand(), "warp");
+            commandsManager.registerCommand(_injector.getInstance(TownCommand.class), "town");
             commandsManager.registerCommand(_injector.getInstance(PermissionsCommand.class), "permissions");
 
             final Plugin vault = getServer().getPluginManager().getPlugin("Vault");
@@ -76,7 +80,7 @@ public class Towny extends JavaPlugin {
     @Override
     public void onDisable() {
         _injector.getInstance(TownManager.class).saveTowns();
-        _injector.getInstance(PlayerManager.class).unload();
+        _injector.getInstance(PlayerManager.class).saveLoaded();
     }
 
     @SafeVarargs

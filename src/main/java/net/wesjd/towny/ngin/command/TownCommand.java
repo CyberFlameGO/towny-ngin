@@ -33,7 +33,9 @@ public class TownCommand {
 
     @Command(aliases = "create", usage = "<town name>", desc = "Creates a new town", min = 1)
     public void createTownCommand(@Sender TownyPlayer player, @Validate(regex = "^(\\w{1,16})$") String name) {
-        if (_townManager.getTownSafely(name).isPresent()) player.message(RED + "A town with the name " + name + " already exists");
+        if (_townManager.getTownSafely(name).isPresent()) {
+            player.message(RED + "A town with the name " + name + " already exists towns: "+_townManager.TEMP_removeMe());
+        }
         else {
             final Town newTown = _townManager.createTown(name);
             newTown.generateDefaultRanks(player);
@@ -51,7 +53,7 @@ public class TownCommand {
             final Town town = player.getTown();
             player.message(YELLOW + "----- [ About " + GREEN + town.getName() + YELLOW + " ] -----");
             player.message(YELLOW + "Your rank: " + RED + town.getTownRankFor(player).getDisplayName());
-            player.message(YELLOW + "Town money: " + RED + "$" + NumberFormat.getCurrencyInstance().format(town.getMoney()));
+            player.message(YELLOW + "Town money: " + RED + NumberFormat.getCurrencyInstance().format(town.getMoney()));
 
             final Set<String> warps = town.getWarps().keySet();
             if(warps.isEmpty()) player.message(YELLOW + "Warps: " + RED + "None");

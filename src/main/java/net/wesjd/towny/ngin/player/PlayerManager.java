@@ -80,7 +80,7 @@ public class PlayerManager {
      */
     public TownyPlayer initializePlayer(Player player, OfflineTownyPlayer offline) {
         Validate.isTrue(!_store.containsKey(offline.getUuid()));
-        return _store.put(offline.getUuid(), new TownyPlayer(player, _storage, offline));
+        return _store.put(offline.getUuid(), new TownyPlayer(player, _storage, _townManager, offline));
     }
 
     /**
@@ -119,6 +119,13 @@ public class PlayerManager {
      */
     public Collection<TownyPlayer> getOnlinePlayers() {
         return Collections.unmodifiableCollection(_store.values());
+    }
+
+    /**
+     * Saves the currently loaded players
+     */
+    public void saveLoaded() {
+        _store.values().forEach(TownyPlayer::save);
     }
 
 }
