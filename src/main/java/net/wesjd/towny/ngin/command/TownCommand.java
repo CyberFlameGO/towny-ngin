@@ -36,8 +36,8 @@ public class TownCommand {
             newTown.generateDefaultRanks();
             _townManager.addTown(newTown);
 
-            TownData data = new TownData(newTown.getTownName(), newTown.getRankByName("mayor").orElseThrow(() -> new RuntimeException("Unable to find Mayor rank")));
-            player.setTownData(data);
+            TownData data = new TownData(newTown.getName(), newTown.getRankByName("mayor").orElseThrow(() -> new RuntimeException("Unable to find Mayor rank")));
+            player.setTownName(data);
 
             player.message(ChatColor.GREEN + "Created the " + name + " town!");
         }
@@ -45,9 +45,9 @@ public class TownCommand {
 
     @Command(aliases = "info", desc = "Shows your town info")
     public void getTownInfo(@Sender TownyPlayer player) {
-        if (player.getTownyName() == null) player.message(ChatColor.RED + "You aren't apart of any town!");
+        if (player.getTownName() == null) player.message(ChatColor.RED + "You aren't apart of any town!");
         else {
-            final TownData data = player.getTownyName();
+            final TownData data = player.getTownName();
             final Town town = _townManager.getTown(data.getTownName());
             player.message(ChatColor.YELLOW + "----- [ About " + ChatColor.GREEN + data.getTownName() + ChatColor.YELLOW + " ] -----");
             player.message(ChatColor.YELLOW + "Your rank: " + ChatColor.RED + data.getTownRank().getDisplay());
@@ -67,7 +67,7 @@ public class TownCommand {
         _townManager.loadTowns();
 
         TownyPlayer tPlayer = _playerManager.getPlayer(player);
-        TownData data = tPlayer.getTownyName();
+        TownData data = tPlayer.getTownName();
         player.sendMessage(ChatColor.YELLOW + "You are apart of the " + data.getTownName() + " town, and you are " + data.getTownRank().getDisplay());
         Town town = _townManager.getTown(data.getTownName());
         player.sendMessage(ChatColor.YELLOW + "Your town has $" + town.getMoney() + " and the following warps: " + town.getWarps().keySet());

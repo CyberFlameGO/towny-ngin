@@ -6,6 +6,7 @@ import com.google.common.cache.LoadingCache;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 import net.wesjd.towny.ngin.storage.StorageFolder;
+import net.wesjd.towny.ngin.town.TownManager;
 import net.wesjd.towny.ngin.util.UUIDFetcher;
 import org.apache.commons.lang.Validate;
 import org.bukkit.entity.Player;
@@ -26,6 +27,11 @@ public class PlayerManager {
      */
     @Inject @Named("players")
     private StorageFolder _storage;
+    /**
+     * The injected {@link TownManager}
+     */
+    @Inject
+    private TownManager _townManager;
 
     /**
      * {@link UUID} to {@link TownyPlayer} store
@@ -66,7 +72,7 @@ public class PlayerManager {
      * @return The created {@link OfflineTownyPlayer}
      */
     public OfflineTownyPlayer createOfflineTownyPlayer(UUID uuid) {
-        return new OfflineTownyPlayer(_storage, uuid);
+        return new OfflineTownyPlayer(_storage, _townManager, uuid);
     }
 
     /**

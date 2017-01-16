@@ -8,6 +8,7 @@ import org.bukkit.permissions.Permission;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -40,14 +41,13 @@ public enum Rank {
         this._color = color;
 
         try {
-
             File permissionsFolder = new File(Bukkit.getPluginManager().getPlugin("ngin").getDataFolder(), "permissions");
             if(!permissionsFolder.exists()) permissionsFolder.mkdir();
 
             final File permissionsFile = new File(permissionsFolder, toString().toLowerCase());
             if (!permissionsFile.exists()) permissionsFile.createNewFile();
 
-            Files.readLines(permissionsFile, Charsets.UTF_8).forEach(line -> _permissions.add(new Permission(line)));
+            Files.readLines(permissionsFile, StandardCharsets.UTF_8).forEach(line -> _permissions.add(new Permission(line)));
         } catch (IOException ex) {
             ex.printStackTrace();
         }

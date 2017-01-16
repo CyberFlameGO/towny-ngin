@@ -53,7 +53,7 @@ public class Town {
      * The name of the town
      */
     @Data
-    private String _townName;
+    private String _name;
 
     /**
      * The ranks that the town has
@@ -68,7 +68,7 @@ public class Town {
      * @param storage The folder the town is stored in
      */
     Town(String name, StorageFolder storage) {
-        _townName = name;
+        _name = name;
         _storage = storage;
     }
 
@@ -100,26 +100,26 @@ public class Town {
         return _warps;
     }
 
-    public String getTownName() {
-        return _townName;
+    public String getName() {
+        return _name;
     }
 
     public void setTownName(String townName) {
-        _townName = townName;
+        _name = townName;
     }
 
     /**
      * Saves the town to the file
      */
     public void save() {
-        _storage.packup(_townName, this);
+        _storage.packup(_name, this);
     }
 
     /**
      * Loads the town from the file and sets the fields
      */
     public void load() {
-        _storage.unbox(_townName, this);
+        _storage.unbox(_name, this);
     }
 
     /**
@@ -147,12 +147,12 @@ public class Town {
 
         Town town = (Town) o;
 
-        return _townName.equalsIgnoreCase(town._townName);
+        return _name.equalsIgnoreCase(town._name);
     }
 
     @Override
     public int hashCode() {
-        return _townName.toLowerCase().hashCode();
+        return _name.toLowerCase().hashCode();
     }
 
     @Override
@@ -162,7 +162,7 @@ public class Town {
         sb.append(", _region=").append(_region);
         sb.append(", _money=").append(_money);
         sb.append(", _warps=").append(_warps);
-        sb.append(", _townName='").append(_townName).append('\'');
+        sb.append(", _townName='").append(_name).append('\'');
         sb.append('}');
         return sb.toString();
     }

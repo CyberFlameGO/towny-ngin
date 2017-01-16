@@ -2,6 +2,8 @@ package net.wesjd.towny.ngin.player;
 
 import net.wesjd.towny.ngin.storage.Data;
 import net.wesjd.towny.ngin.storage.StorageFolder;
+import net.wesjd.towny.ngin.town.Town;
+import net.wesjd.towny.ngin.town.TownManager;
 import org.bukkit.entity.Player;
 
 import java.util.UUID;
@@ -14,12 +16,16 @@ public class OfflineTownyPlayer {
     /**
      * The storage folder for players
      */
-    private StorageFolder _storage;
+    private final StorageFolder _storage;
 
     /**
      * The player's uuid
      */
     private final UUID _uuid;
+    /**
+     * The player's town object, cached to save on lookup time
+     */
+    private Town _town;
 
     /**
      * The amount of money the player has
@@ -36,26 +42,27 @@ public class OfflineTownyPlayer {
      * The last username the player had when logging into our server
      */
     @Data
-    private String _lastName;
+    private String _lastKnownName;
 
     /**
-     * The current town this player is apart of
+     * The current town this player is apart of, only used in to save
      */
     @Data
     private String _townName;
 
     /**
-     * Fills this offline player with a previous one (used in {@link TownyPlayer#TownyPlayer(Player, StorageFolder, OfflineTownyPlayer)})
+     * Fills this offline player with a previous one (used in {@link TownyPlayer#TownyPlayer(Player, StorageFolder, TownManager, OfflineTownyPlayer)})
      *
      * @param fill The offline player to fill from
      */
     protected OfflineTownyPlayer(StorageFolder storage, OfflineTownyPlayer fill) {
         _storage = storage;
         _uuid = fill.getUuid();
+        _town = fill.getTown();
         _money = fill.getMoney();
         _rank = fill.getRank();
-        _lastName = fill.getLastName();
-        _townName = fill.getTownyName();
+        _lastKnownName = fill.getLastKnownName();
+        _townName = fill._townName;
     }
 
     /**
@@ -63,10 +70,11 @@ public class OfflineTownyPlayer {
      *
      * @param uuid The {@link UUID} to load data about
      */
-    OfflineTownyPlayer(StorageFolder storage, UUID uuid) {
+    OfflineTownyPlayer(StorageFolder storage, TownManager townManager, UUID uuid) {
         _storage = storage;
         _uuid = uuid;
         _storage.unbox(uuid.toString(), this);
+        _town = townManager.getTown(_townName);
     }
 
     public UUID getUuid() {
@@ -97,20 +105,21 @@ public class OfflineTownyPlayer {
         _rank = rank;
     }
 
-    public String getLastName() {
-        return _lastName;
+    public String getLastKnownName() {
+        return _lastKnownName;
     }
 
-    public void setLastName(String lastName) {
-        _lastName = lastName;
+    public void setLastKnownName(String lastName) {
+        _lastKnownName = lastName;
     }
 
-    public String getTownyName() {
-        return _townName;
+    public Town getTown() {
+        return _town;
     }
 
-    public void setTownData(String townName) {
-        _townName = townName;
+    public void setTown(Town town) {
+        _town = town;
+        _townName = town.getName();
     }
 
     /**

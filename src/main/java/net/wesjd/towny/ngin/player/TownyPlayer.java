@@ -1,6 +1,7 @@
 package net.wesjd.towny.ngin.player;
 
 import net.wesjd.towny.ngin.storage.StorageFolder;
+import net.wesjd.towny.ngin.town.TownManager;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.permissions.PermissionAttachment;
@@ -30,6 +31,7 @@ public class TownyPlayer extends OfflineTownyPlayer {
         super(storage, offline);
         _wrapped = wrapped;
         _attachment = new PermissionAttachment(Bukkit.getPluginManager().getPlugin("ngin"), _wrapped);
+        setLastKnownName(wrapped.getName());
         setRank(getRank()); //to give the player their permissions
     }
 
