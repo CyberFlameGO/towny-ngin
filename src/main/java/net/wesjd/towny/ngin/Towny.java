@@ -7,11 +7,14 @@ import com.google.inject.Singleton;
 import li.l1t.common.intake.provider.annotation.Sender;
 import net.milkbowl.vault.economy.Economy;
 import li.l1t.common.intake.CommandsManager;
+import net.wesjd.towny.ngin.command.PermissionsCommand;
 import net.wesjd.towny.ngin.command.TestCommand;
 import net.wesjd.towny.ngin.command.TownCommand;
-import net.wesjd.towny.ngin.command.TownyPlayerProvider;
+import net.wesjd.towny.ngin.command.provider.RankProvider;
+import net.wesjd.towny.ngin.command.provider.TownyPlayerProvider;
 import net.wesjd.towny.ngin.listeners.JoinLeaveListener;
 import net.wesjd.towny.ngin.player.PlayerManager;
+import net.wesjd.towny.ngin.player.Rank;
 import net.wesjd.towny.ngin.player.TownyPlayer;
 import net.wesjd.towny.ngin.storage.GStorageModule;
 import net.wesjd.towny.ngin.util.economy.EconomyInjection;
@@ -33,20 +36,19 @@ public class Towny extends JavaPlugin {
                 @Override
                 protected void configure() {
                     bind(Towny.class).toInstance(Towny.this);
+
                     bind(PlayerManager.class).in(Singleton.class);
+
+                    bind(PermissionsCommand.class);
                 }
             }
     );
 
     @Override
     public void onEnable() {
-<<<<<<< HEAD
-        getDataFolder().mkdirs();
-        new File(getDataFolder(), "permissions").mkdirs();
-        registerListeners(JoinLeaveListener.class);
-=======
         try {
             getDataFolder().mkdirs();
+            new File(getDataFolder(), "permissions").mkdirs();
             registerListeners(JoinLeaveListener.class);
 
             final CommandsManager commandsManager = new CommandsManager(this);
@@ -54,8 +56,11 @@ public class Towny extends JavaPlugin {
             commandsManager.bind(TownyPlayer.class)
                     .annotatedWith(Sender.class)
                     .toProvider(new TownyPlayerProvider(commandsManager.getTranslator(), _injector.getInstance(PlayerManager.class)));
+            commandsManager.bind(Rank.class)
+                    .toProvider(new RankProvider());
             commandsManager.registerCommand(new TestCommand(), "test");
             commandsManager.registerCommand(new TownCommand(), "town");
+            commandsManager.registerCommand(_injector.getInstance(PermissionsCommand.class), "permissions");
 
             final Plugin vault = getServer().getPluginManager().getPlugin("Vault");
             getServer().getServicesManager().register(Economy.class, _injector.getInstance(EconomyInjection.class), vault, ServicePriority.Normal);
@@ -64,7 +69,6 @@ public class Towny extends JavaPlugin {
             ex.printStackTrace();
             Bukkit.shutdown();
         }
->>>>>>> master
     }
 
     @Override

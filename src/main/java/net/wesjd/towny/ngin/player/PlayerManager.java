@@ -10,9 +10,7 @@ import net.wesjd.towny.ngin.util.UUIDFetcher;
 import org.apache.commons.lang.Validate;
 import org.bukkit.entity.Player;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
@@ -106,6 +104,15 @@ public class PlayerManager {
      */
     public void removePlayer(Player player) {
         _store.remove(player.getUniqueId()).save();
+    }
+
+    /**
+     * Get all of the online players
+     *
+     * @return A collection containing all online players
+     */
+    public Collection<TownyPlayer> getOnlinePlayers() {
+        return Collections.unmodifiableCollection(_store.values());
     }
 
 }
