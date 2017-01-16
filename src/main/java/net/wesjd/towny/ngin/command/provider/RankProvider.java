@@ -17,7 +17,7 @@ public class RankProvider extends BaseProvider<Rank> {
     @Override
     public Rank get(CommandArgs arguments, List<? extends Annotation> list) throws ArgumentException, ProvisionException {
         try {
-            return Rank.valueOf(arguments.next());
+            return Rank.valueOf(arguments.next().toUpperCase());
         } catch (Exception ex) {
             throw new CommandExitMessage("Invalid rank type. Valid values are: " + Arrays.toString(Rank.values()));
         }
