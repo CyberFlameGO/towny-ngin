@@ -53,7 +53,7 @@ public class CommandManager {
         final CommandData command = _commands.get(calledCommand);
         final Arguments arguments = new Arguments(providedArguments);
         final SubCommandData topSubcommand = getTopSubcommand(calledCommand, arguments, null, command.getSubcommands());
-        if(topSubcommand != null) invokeCommandMethod(command.getClassInstance(), command.getMethod(), arguments);
+        if(topSubcommand != null) invokeCommandMethod(command.getClassInstance(), topSubcommand.getMethod(), arguments);
         else invokeCommandMethod(command.getClassInstance(), command.getMethod(), arguments);
     }
 
@@ -67,11 +67,11 @@ public class CommandManager {
      * @return The top subcommand
      */
     private SubCommandData getTopSubcommand(String base, Arguments arguments, SubCommandData lastTop, Set<SubCommandData> subcommands) {
-        final String subcommandOf = base + arguments.next();
-        return subcommands.stream()
-                .filter(subcommand -> subcommand.getAnnotation().of().equals(subcommandOf))
-                .map(subcommand -> getTopSubcommand(subcommandOf + subcommand.getAnnotation().name(), arguments, subcommand, subcommand.getSubcommands()))
-                .findFirst().orElse(lastTop);
+        for(SubCommandData subcommand : subcommands) {
+            if(subcommand.getAnnotation().of().equals(base) && arguments.hasNext())
+                return getTopSubcommand(base + " " + subcommand.getAnnotation().name(), arguments, subcommand, subcommand.getSubcommands());
+        }
+        return lastTop;
     }
 
     /**
@@ -95,7 +95,8 @@ public class CommandManager {
                                 }
                                 if(type.isAssignableFrom(String.class)) return arguments.next();
                                 else throw new RuntimeException("Cannot convert " + parameter.getType().getSimpleName() + " to required type.");
-                            }));
+                            })
+                            .toArray(Object[]::new));
         } catch (IllegalAccessException | InvocationTargetException ex) {
             ex.printStackTrace();
         }
@@ -120,7 +121,7 @@ public class CommandManager {
             commands.forEach(method -> {
                 final Command command = method.getAnnotation(Command.class);
                 _commands.put(command.name(), new CommandData(commandObject, command, method,
-                        getSubCommands(command.name(), subcommands));
+                        getSubCommands(command.name(), subcommands)));
             });
         } catch (InstantiationException | IllegalAccessException e) {
             e.printStackTrace();
@@ -135,12 +136,16 @@ public class CommandManager {
      * @return All of the generated subcommands
      */
     private Set<SubCommandData> getSubCommands(String of, Set<Method> subcommands) {
-        return subcommands.stream()
-                .map(method -> {
-                    final SubCommand subcommand = method.getAnnotation(SubCommand.class);
-                    return new SubCommandData(subcommand, method, getSubCommands(of + " " + subcommand.name(), subcommands));
-                })
-                .collect(Collectors.toSet());
+        final Set<SubCommandData> ret = new HashSet<>();
+
+        final Iterator<Method> iterator = subcommands.iterator();
+        while(iterator.hasNext()) {
+            final Method method = iterator.next();
+            final SubCommand subcommand = method.getAnnotation(SubCommand.class);
+            ret.add(new SubCommandData(subcommand, method, iterator.hasNext() ? getSubCommands(of + " " + subcommand.name(), subcommands) : Collections.emptySet()));
+        }
+
+        return ret;
     }
 
     /**

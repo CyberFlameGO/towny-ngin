@@ -17,4 +17,8 @@ public class Arguments {
         return _position;
     }
 
+    public boolean hasNext() {
+        return _position < _arguments.length;
+    }
+
 }
