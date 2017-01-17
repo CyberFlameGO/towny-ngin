@@ -2,7 +2,8 @@ package net.wesjd.towny.ngin.command.framework;
 
 import net.wesjd.towny.ngin.command.framework.annotation.Command;
 import net.wesjd.towny.ngin.command.framework.annotation.SubCommand;
-import net.wesjd.towny.ngin.command.framework.provider.ArgumentProvider;
+import net.wesjd.towny.ngin.command.framework.argument.ArgumentBinding;
+import net.wesjd.towny.ngin.command.framework.argument.Arguments;
 import org.reflections.Reflections;
 
 import java.lang.annotation.Annotation;
@@ -30,6 +31,16 @@ public class CommandManager {
      */
     public CommandManager() {
         new Reflections("net.wesjd.towny.ngin.command").getSubTypesOf(Commandable.class).forEach(this::buildCommands);
+    }
+
+    /**
+     * Start an argument binding
+     *
+     * @param type The argument type
+     * @return A binding builder
+     */
+    public ArgumentBinding.Builder bind(Class<?> type) {
+        return new ArgumentBinding.Builder((binding) -> _bindings.put(type, binding));
     }
 
     /**
@@ -228,43 +239,6 @@ public class CommandManager {
 
         public Set<SubCommandData> getSubcommands() {
             return Collections.unmodifiableSet(_subcommands);
-        }
-
-    }
-
-    /**
-     * Represents an argument binding
-     *
-     * @param <T> The argument binding type
-     */
-    private static class ArgumentBinding<T> {
-
-        /**
-         * The argument's provider
-         */
-        private final ArgumentProvider<T> _argumentProvider;
-        /**
-         * The arguments specific annotation
-         */
-        private final Class<? extends Annotation> _annotation;
-
-        /**
-         * Store some data on an argument binding
-         *
-         * @param argumentProvider The {@link ArgumentProvider} for this binding
-         * @param annotation The optional annotation for this binding
-         */
-        public ArgumentBinding(ArgumentProvider<T> argumentProvider, Class<? extends Annotation> annotation) {
-            _argumentProvider = argumentProvider;
-            _annotation = annotation;
-        }
-
-        public ArgumentProvider<T> getArgumentProvider() {
-            return _argumentProvider;
-        }
-
-        public Optional<Class<? extends Annotation>> getAnnotation() {
-            return Optional.ofNullable(_annotation);
         }
 
     }

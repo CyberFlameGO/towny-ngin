@@ -1,4 +1,4 @@
-package net.wesjd.towny.ngin.command.framework;
+package net.wesjd.towny.ngin.command.framework.argument;
 
 public class Arguments {
 
