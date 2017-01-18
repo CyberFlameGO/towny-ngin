@@ -69,7 +69,7 @@ public class CommandManager {
     private SubCommandData getTopSubcommand(String base, Arguments arguments, SubCommandData lastTop, Set<SubCommandData> subcommands) {
         for(SubCommandData subcommand : subcommands) {
             if(subcommand.getAnnotation().of().equals(base) && arguments.hasNext())
-                return getTopSubcommand(base + " " + subcommand.getAnnotation().name(), arguments, subcommand, subcommand.getSubcommands());
+                return getTopSubcommand(base + " " + arguments.next(), arguments, subcommand, subcommand.getSubcommands());
         }
         return lastTop;
     }
@@ -138,11 +138,10 @@ public class CommandManager {
     private Set<SubCommandData> getSubCommands(String of, Set<Method> subcommands) {
         final Set<SubCommandData> ret = new HashSet<>();
 
-        final Iterator<Method> iterator = subcommands.iterator();
-        while(iterator.hasNext()) {
-            final Method method = iterator.next();
+        for(Method method : subcommands) {
             final SubCommand subcommand = method.getAnnotation(SubCommand.class);
-            ret.add(new SubCommandData(subcommand, method, iterator.hasNext() ? getSubCommands(of + " " + subcommand.name(), subcommands) : Collections.emptySet()));
+            if (subcommand.of().equals(of))
+                ret.add(new SubCommandData(subcommand, method, getSubCommands(of + " " + subcommand.name(), subcommands)));
         }
 
         return ret;
