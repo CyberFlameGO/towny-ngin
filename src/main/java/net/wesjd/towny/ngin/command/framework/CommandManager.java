@@ -91,7 +91,7 @@ public class CommandManager {
                                 if(binding != null) {
                                     final Optional<Class<? extends Annotation>> annotation = binding.getAnnotation();
                                     if(!annotation.isPresent() || (annotation.isPresent() && parameter.isAnnotationPresent(annotation.get())))
-                                        return binding.getArgumentProvider().get(annotation, arguments);
+                                        return binding.getArgumentProvider().get(parameter, arguments);
                                 }
                                 if(type.isAssignableFrom(String.class)) return arguments.next();
                                 else throw new RuntimeException("Cannot convert " + parameter.getType().getSimpleName() + " to required type.");

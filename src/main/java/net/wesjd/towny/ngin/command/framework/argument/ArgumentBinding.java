@@ -6,6 +6,9 @@ import java.lang.annotation.Annotation;
 import java.util.Optional;
 import java.util.function.Consumer;
 
+/**
+ * Stores data on an argument binding
+ */
 public class ArgumentBinding<T> {
 
     /**
@@ -86,7 +89,7 @@ public class ArgumentBinding<T> {
          * @param object The object instance
          */
         public <I> void toInstance(I object) {
-            toProvider((annotation, arguments) -> object);
+            toProvider((parameter, arguments) -> object);
         }
 
     }
