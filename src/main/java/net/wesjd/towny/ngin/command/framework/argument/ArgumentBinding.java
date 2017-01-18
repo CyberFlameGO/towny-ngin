@@ -4,8 +4,6 @@ import net.wesjd.towny.ngin.command.framework.argument.provider.ArgumentProvider
 
 import java.lang.annotation.Annotation;
 import java.util.Optional;
-import java.util.concurrent.Callable;
-import java.util.concurrent.Future;
 import java.util.function.Consumer;
 
 public class ArgumentBinding<T> {
@@ -88,7 +86,7 @@ public class ArgumentBinding<T> {
          * @param object The object instance
          */
         public <I> void toInstance(I object) {
-            toProvider(arguments -> object);
+            toProvider((annotation, arguments) -> object);
         }
 
     }
