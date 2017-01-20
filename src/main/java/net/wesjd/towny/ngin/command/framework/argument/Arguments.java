@@ -1,5 +1,7 @@
 package net.wesjd.towny.ngin.command.framework.argument;
 
+import java.util.Optional;
+
 /**
  * Contains the arguments for a command
  */
@@ -32,10 +34,14 @@ public class Arguments {
         return _arguments[_position++];
     }
 
+    public Optional<String> safeNext() {
+        return _position == _arguments.length ? Optional.empty() : Optional.of(next());
+    }
+
     /**
      * Get the position of the iteration
      *
-     * @return The iteration's positio
+     * @return The iteration's position
      */
     public int position() {
         return _position;

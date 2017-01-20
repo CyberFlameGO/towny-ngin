@@ -38,8 +38,6 @@ public class Towny extends JavaPlugin {
             getDataFolder().mkdirs();
             registerListeners(JoinLeaveListener.class);
 
-
-
             final Plugin vault = getServer().getPluginManager().getPlugin("Vault");
             getServer().getServicesManager().register(Economy.class, _injector.getInstance(EconomyInjection.class), vault, ServicePriority.Normal);
             getLogger().info("Injected custom economy for vault.");

@@ -1,16 +1,24 @@
 package net.wesjd.towny.ngin.command.framework;
 
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.Multimap;
 import net.wesjd.towny.ngin.command.framework.annotation.Command;
 import net.wesjd.towny.ngin.command.framework.annotation.SubCommand;
 import net.wesjd.towny.ngin.command.framework.argument.ArgumentBinding;
 import net.wesjd.towny.ngin.command.framework.argument.Arguments;
+import net.wesjd.towny.ngin.command.framework.argument.provider.ArgumentProvider;
+import net.wesjd.towny.ngin.command.framework.argument.verifier.ArgumentVerifier;
 import org.reflections.Reflections;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.lang.reflect.Parameter;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * Stores and handles all commands
@@ -25,12 +33,26 @@ public class CommandManager {
      * A store of argument types to their bindings
      */
     private final Map<Class<?>, ArgumentBinding<?>> _bindings = new HashMap<>();
+    /**
+     * A store of argument types to verifiers
+     */
+    private final Multimap<Class<?>, ArgumentVerifier> _verifiers = ArrayListMultimap.create();
 
     /**
      * Loads all of the commandables
      */
     public CommandManager() {
         new Reflections("net.wesjd.towny.ngin.command").getSubTypesOf(Commandable.class).forEach(this::buildCommands);
+    }
+
+    /**
+     * Bind an object to it's verifier
+     *
+     * @param type The type the verifier is bound to
+     * @param verifier The verifier itself
+     */
+    public <T> void addVerifier(Class<T> type, ArgumentVerifier<T> verifier) {
+        _verifiers.put(type, verifier);
     }
 
     /**
@@ -83,23 +105,46 @@ public class CommandManager {
      */
     private void invokeCommandMethod(Object object, Method method, Arguments arguments) {
         try {
-            method.invoke(object,
-                    Arrays.stream(method.getParameters())
-                            .map(parameter -> {
-                                final Class<?> type = parameter.getType();
-                                final ArgumentBinding binding = _bindings.get(type);
-                                if(binding != null) {
-                                    final Optional<Class<? extends Annotation>> annotation = binding.getAnnotation();
-                                    if(!annotation.isPresent() || (annotation.isPresent() && parameter.isAnnotationPresent(annotation.get())))
-                                        return binding.getArgumentProvider().get(parameter, arguments);
-                                }
-                                if(type.isAssignableFrom(String.class)) return arguments.next();
-                                else throw new RuntimeException("Cannot convert " + parameter.getType().getSimpleName() + " to required type.");
-                            })
-                            .toArray(Object[]::new));
+            final Parameter[] parameters = method.getParameters();
+            final Object[] suppliedParameters = Arrays.stream(parameters)
+                    .map(parameter -> {
+                        final Class<?> type = parameter.getType();
+                        final ArgumentBinding<?> binding = _bindings.get(type);
+                        if(binding != null) {
+                            final Optional<Class<? extends Annotation>> annotation = binding.getAnnotation();
+                            if(!annotation.isPresent() || (annotation.isPresent() && parameter.isAnnotationPresent(annotation.get())))
+                                return binding.getArgumentProvider().get(parameter, arguments);
+                        }
+                        if(type.isAssignableFrom(String.class)) return arguments.safeNext().orElse(null);
+                        else throw new RuntimeException("Cannot convert " + parameter.getType().getSimpleName() + " to required type.");
+                    })
+                    .toArray(Object[]::new);
+            final AtomicInteger index = new AtomicInteger();
+            final Optional<String> failure = Arrays.stream(parameters)
+                    .flatMap(parameter -> {
+                        final int currentIndex = index.getAndIncrement();
+                        return getVerifiersFor(parameter.getType()).map(verifier -> verifier.verify(parameter, suppliedParameters[currentIndex]));
+                    })
+                    .filter(Objects::nonNull)
+                    .map(Optional::of)
+                    .findFirst().flatMap(Function.identity());
+            if(failure.isPresent()) System.out.println("FAILURE: " + failure.get());
+            else method.invoke(object, suppliedParameters);
         } catch (IllegalAccessException | InvocationTargetException ex) {
             ex.printStackTrace();
         }
+    }
+
+    /**
+     * Gets the verifiers for a type, including object verifiers
+     *
+     * @param type The object type
+     * @return A stream of the found verifiers
+     */
+    private Stream<ArgumentVerifier> getVerifiersFor(Class<?> type) {
+        final Collection<ArgumentVerifier> verifiers = _verifiers.get(type);
+        verifiers.addAll(_verifiers.get(Object.class));
+        return verifiers.stream();
     }
 
     /**
