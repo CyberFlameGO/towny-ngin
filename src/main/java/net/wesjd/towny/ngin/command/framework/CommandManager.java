@@ -2,12 +2,20 @@ package net.wesjd.towny.ngin.command.framework;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
+import com.google.inject.Inject;
+import net.wesjd.towny.ngin.Towny;
 import net.wesjd.towny.ngin.command.framework.annotation.Command;
 import net.wesjd.towny.ngin.command.framework.annotation.SubCommand;
 import net.wesjd.towny.ngin.command.framework.argument.ArgumentBinding;
 import net.wesjd.towny.ngin.command.framework.argument.Arguments;
-import net.wesjd.towny.ngin.command.framework.argument.provider.ArgumentProvider;
 import net.wesjd.towny.ngin.command.framework.argument.verifier.ArgumentVerifier;
+import net.wesjd.towny.ngin.player.PlayerManager;
+import net.wesjd.towny.ngin.player.TownyPlayer;
+import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.reflections.Reflections;
 
 import java.lang.annotation.Annotation;
@@ -18,6 +26,7 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 /**
@@ -41,8 +50,20 @@ public class CommandManager {
     /**
      * Loads all of the commandables
      */
-    public CommandManager() {
+    @Inject
+    public CommandManager(Towny main, PlayerManager playerManager) {
         new Reflections("net.wesjd.towny.ngin.command").getSubTypesOf(Commandable.class).forEach(this::buildCommands);
+        Bukkit.getPluginManager().registerEvents(new Listener() {
+            @EventHandler
+            public void onCommand(PlayerCommandPreprocessEvent e) {
+                final String[] parsed = e.getMessage().split(" ");
+                final String commandName = parsed[0].substring(1);
+                final String[] args = new String[parsed.length-1];
+                System.arraycopy(parsed, 1, args, 0, args.length);
+                if(callCommand(playerManager.getPlayer(e.getPlayer()), commandName, args))
+                    e.setCancelled(true);
+            }
+        }, main);
     }
 
     /**
@@ -70,13 +91,17 @@ public class CommandManager {
      *
      * @param calledCommand The command that should be called
      * @param providedArguments The command arguments
+     * @return Weather the command successfully executed
      */
-    public void callCommand(String calledCommand, String[] providedArguments) {
+    public boolean callCommand(TownyPlayer caller, String calledCommand, String[] providedArguments) {
         final CommandData command = _commands.get(calledCommand);
-        final Arguments arguments = new Arguments(providedArguments);
-        final SubCommandData topSubcommand = getTopSubcommand(calledCommand, arguments, null, command.getSubcommands());
-        if(topSubcommand != null) invokeCommandMethod(command.getClassInstance(), topSubcommand.getMethod(), arguments);
-        else invokeCommandMethod(command.getClassInstance(), command.getMethod(), arguments);
+        if(command != null) {
+            final Arguments arguments = new Arguments(providedArguments);
+            final SubCommandData topSubcommand = getTopSubcommand(calledCommand, arguments, null, command.getSubcommands());
+            if(topSubcommand != null) invokeCommandMethod(command.getClassInstance(), topSubcommand.getMethod(), caller, arguments);
+            else invokeCommandMethod(command.getClassInstance(), command.getMethod(), caller, arguments);
+            return true;
+        } else return false;
     }
 
     /**
@@ -103,22 +128,33 @@ public class CommandManager {
      * @param method The method to invoke
      * @param arguments The command arguments
      */
-    private void invokeCommandMethod(Object object, Method method, Arguments arguments) {
+    private void invokeCommandMethod(Object object, Method method, TownyPlayer caller, Arguments arguments) {
         try {
             final Parameter[] parameters = method.getParameters();
-            final Object[] suppliedParameters = Arrays.stream(parameters)
-                    .map(parameter -> {
+
+            final Object[] suppliedParameters = new Object[parameters.length];
+            if(parameters[0].getType().equals(TownyPlayer.class)) suppliedParameters[0] = caller;
+            else throw new RuntimeException("Command must take sender as first parameter.");
+            IntStream.range(1, parameters.length)
+                    .forEach(i -> {
+                        Object supply = null;
+                        final Parameter parameter = parameters[i];
                         final Class<?> type = parameter.getType();
+
                         final ArgumentBinding<?> binding = _bindings.get(type);
                         if(binding != null) {
                             final Optional<Class<? extends Annotation>> annotation = binding.getAnnotation();
                             if(!annotation.isPresent() || (annotation.isPresent() && parameter.isAnnotationPresent(annotation.get())))
-                                return binding.getArgumentProvider().get(parameter, arguments);
+                                supply = binding.getArgumentProvider().get(parameter, arguments);
                         }
-                        if(type.isAssignableFrom(String.class)) return arguments.safeNext().orElse(null);
-                        else throw new RuntimeException("Cannot convert " + parameter.getType().getSimpleName() + " to required type.");
-                    })
-                    .toArray(Object[]::new);
+
+                        if(supply == null) {
+                            if(type.isAssignableFrom(String.class)) supply = arguments.safeNext().orElse(null);
+                            else throw new RuntimeException("Cannot convert " + parameter.getType().getSimpleName() + " to required type.");
+                        }
+                        suppliedParameters[i] = supply;
+                    });
+
             final AtomicInteger index = new AtomicInteger();
             final Optional<String> failure = Arrays.stream(parameters)
                     .flatMap(parameter -> {
@@ -128,7 +164,7 @@ public class CommandManager {
                     .filter(Objects::nonNull)
                     .map(Optional::of)
                     .findFirst().flatMap(Function.identity());
-            if(failure.isPresent()) System.out.println("FAILURE: " + failure.get());
+            if(failure.isPresent()) caller.getWrapped().sendMessage(ChatColor.RED + failure.get());
             else method.invoke(object, suppliedParameters);
         } catch (IllegalAccessException | InvocationTargetException ex) {
             ex.printStackTrace();

@@ -6,6 +6,8 @@ import com.google.inject.Injector;
 import com.google.inject.Singleton;
 import net.milkbowl.vault.economy.Economy;
 import net.wesjd.towny.ngin.command.framework.CommandManager;
+import net.wesjd.towny.ngin.command.framework.argument.verifier.RegexVerifier;
+import net.wesjd.towny.ngin.command.framework.argument.verifier.RequiredVerifier;
 import net.wesjd.towny.ngin.listeners.JoinLeaveListener;
 import net.wesjd.towny.ngin.player.PlayerManager;
 import net.wesjd.towny.ngin.storage.GStorageModule;
@@ -31,12 +33,17 @@ public class Towny extends JavaPlugin {
                 }
             }
     );
+    private CommandManager commandManager;
 
     @Override
     public void onEnable() {
         try {
             getDataFolder().mkdirs();
             registerListeners(JoinLeaveListener.class);
+
+            commandManager = _injector.getInstance(CommandManager.class);
+            commandManager.addVerifier(Object.class, new RequiredVerifier());
+            commandManager.addVerifier(String.class, new RegexVerifier());
 
             final Plugin vault = getServer().getPluginManager().getPlugin("Vault");
             getServer().getServicesManager().register(Economy.class, _injector.getInstance(EconomyInjection.class), vault, ServicePriority.Normal);
