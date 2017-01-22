@@ -1,17 +1,19 @@
 package net.wesjd.towny.ngin.command;
 
-import com.sk89q.intake.Command;
-import li.l1t.common.intake.provider.annotation.ItemInHand;
-import li.l1t.common.intake.provider.annotation.Sender;
-import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
+import net.wesjd.towny.ngin.command.framework.Commandable;
+import net.wesjd.towny.ngin.command.framework.annotation.Command;
+import net.wesjd.towny.ngin.command.framework.annotation.SubCommand;
 
-public class TestCommand {
+public class TestCommand implements Commandable {
 
-    @Command(aliases = "",
-            desc = "just testing")
-    public void testCommand(@Sender Player sender, @ItemInHand ItemStack hand) {
-        sender.sendMessage("yo nice " + hand.getType());
+    @Command(name = "hello", desc = "yeet")
+    public void test() {
+        System.out.println("asdfasdfasd IT WORKED 1");
+    }
+
+    @SubCommand(of = "hello", name = "yeet", desc = "yeet2")
+    public void test2() {
+        System.out.println("asdfasdfasd IT WORKED 2");
     }
 
 }

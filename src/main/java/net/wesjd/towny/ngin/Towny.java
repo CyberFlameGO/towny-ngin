@@ -4,18 +4,12 @@ import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.Singleton;
-import li.l1t.common.intake.provider.annotation.Sender;
 import net.milkbowl.vault.economy.Economy;
-import li.l1t.common.intake.CommandsManager;
-import net.wesjd.towny.ngin.command.PermissionsCommand;
-import net.wesjd.towny.ngin.command.TestCommand;
-import net.wesjd.towny.ngin.command.TownCommand;
-import net.wesjd.towny.ngin.command.provider.RankProvider;
-import net.wesjd.towny.ngin.command.provider.TownyPlayerProvider;
+import net.wesjd.towny.ngin.command.framework.CommandManager;
+import net.wesjd.towny.ngin.command.framework.argument.verifier.RegexVerifier;
+import net.wesjd.towny.ngin.command.framework.argument.verifier.RequiredVerifier;
 import net.wesjd.towny.ngin.listeners.JoinLeaveListener;
 import net.wesjd.towny.ngin.player.PlayerManager;
-import net.wesjd.towny.ngin.player.Rank;
-import net.wesjd.towny.ngin.player.TownyPlayer;
 import net.wesjd.towny.ngin.storage.GStorageModule;
 import net.wesjd.towny.ngin.util.economy.EconomyInjection;
 import org.bukkit.Bukkit;
@@ -26,7 +20,6 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
 import java.util.Arrays;
-import java.util.Locale;
 
 public class Towny extends JavaPlugin {
 
@@ -38,8 +31,7 @@ public class Towny extends JavaPlugin {
                     bind(Towny.class).toInstance(Towny.this);
 
                     bind(PlayerManager.class).in(Singleton.class);
-
-                    bind(PermissionsCommand.class);
+                    bind(CommandManager.class).in(Singleton.class);
                 }
             }
     );
@@ -51,16 +43,9 @@ public class Towny extends JavaPlugin {
             new File(getDataFolder(), "permissions").mkdirs();
             registerListeners(JoinLeaveListener.class);
 
-            final CommandsManager commandsManager = new CommandsManager(this);
-            commandsManager.getTranslator().setLocale(Locale.ROOT);
-            commandsManager.bind(TownyPlayer.class)
-                    .annotatedWith(Sender.class)
-                    .toProvider(new TownyPlayerProvider(commandsManager.getTranslator(), _injector.getInstance(PlayerManager.class)));
-            commandsManager.bind(Rank.class)
-                    .toProvider(new RankProvider());
-            commandsManager.registerCommand(new TestCommand(), "test");
-            commandsManager.registerCommand(new TownCommand(), "town");
-            commandsManager.registerCommand(_injector.getInstance(PermissionsCommand.class), "permissions");
+            final CommandManager commandManager = _injector.getInstance(CommandManager.class);
+            commandManager.addVerifier(Object.class, new RequiredVerifier());
+            commandManager.addVerifier(String.class, new RegexVerifier());
 
             final Plugin vault = getServer().getPluginManager().getPlugin("Vault");
             getServer().getServicesManager().register(Economy.class, _injector.getInstance(EconomyInjection.class), vault, ServicePriority.Normal);
