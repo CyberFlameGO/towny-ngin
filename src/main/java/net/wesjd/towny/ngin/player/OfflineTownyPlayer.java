@@ -87,6 +87,10 @@ public class OfflineTownyPlayer {
         return _rank;
     }
 
+    public boolean hasRank(Rank rank) {
+        return (_rank.compareTo(rank) >= 0);
+    }
+
     public void setRank(Rank rank) {
         _rank = rank;
     }
