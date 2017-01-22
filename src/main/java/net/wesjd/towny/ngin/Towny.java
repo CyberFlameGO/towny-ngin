@@ -33,7 +33,6 @@ public class Towny extends JavaPlugin {
                 }
             }
     );
-    private CommandManager commandManager;
 
     @Override
     public void onEnable() {
@@ -41,7 +40,7 @@ public class Towny extends JavaPlugin {
             getDataFolder().mkdirs();
             registerListeners(JoinLeaveListener.class);
 
-            commandManager = _injector.getInstance(CommandManager.class);
+            final CommandManager commandManager = _injector.getInstance(CommandManager.class);
             commandManager.addVerifier(Object.class, new RequiredVerifier());
             commandManager.addVerifier(String.class, new RegexVerifier());
 

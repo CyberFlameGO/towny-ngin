@@ -20,14 +20,4 @@ public @interface Command {
      */
     String desc();
 
-    /**
-     * The command usage
-     */
-    String usage() default "";
-
-    /**
-     * The minimum amount of arguments required, otherwise shows the usage
-     */
-    int min() default 0;
-
 }
