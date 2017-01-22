@@ -15,9 +15,4 @@ public @interface Command {
      */
     String name();
 
-    /**
-     * The description of the command
-     */
-    String desc();
-
 }

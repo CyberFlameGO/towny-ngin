@@ -20,9 +20,4 @@ public @interface SubCommand {
      */
     String name();
 
-    /**
-     * The description of the command
-     */
-    String desc();
-
 }
