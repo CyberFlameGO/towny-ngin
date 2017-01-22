@@ -5,14 +5,15 @@ import com.google.common.collect.Multimap;
 import com.google.inject.Inject;
 import net.wesjd.towny.ngin.Towny;
 import net.wesjd.towny.ngin.command.framework.annotation.Command;
+import net.wesjd.towny.ngin.command.framework.annotation.Requires;
 import net.wesjd.towny.ngin.command.framework.annotation.SubCommand;
 import net.wesjd.towny.ngin.command.framework.argument.ArgumentBinding;
 import net.wesjd.towny.ngin.command.framework.argument.Arguments;
 import net.wesjd.towny.ngin.command.framework.argument.verifier.ArgumentVerifier;
 import net.wesjd.towny.ngin.player.PlayerManager;
+import net.wesjd.towny.ngin.player.Rank;
 import net.wesjd.towny.ngin.player.TownyPlayer;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
@@ -29,10 +30,17 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
+import static org.bukkit.ChatColor.*;
+
 /**
  * Stores and handles all commands
  */
 public class CommandManager {
+
+    /**
+     * A main class instance, provided in the constructor
+     */
+    private Towny _main;
 
     /**
      * A store of command names to their command data to save on lookup time
@@ -52,6 +60,7 @@ public class CommandManager {
      */
     @Inject
     public CommandManager(Towny main, PlayerManager playerManager) {
+        _main = main;
         new Reflections("net.wesjd.towny.ngin.command").getSubTypesOf(Commandable.class).forEach(this::buildCommands);
         Bukkit.getPluginManager().registerEvents(new Listener() {
             @EventHandler
@@ -130,6 +139,13 @@ public class CommandManager {
      */
     private void invokeCommandMethod(Object object, Method method, TownyPlayer caller, Arguments arguments) {
         try {
+            if(method.isAnnotationPresent(Requires.class)) {
+                final Rank required = method.getAnnotation(Requires.class).rank();
+                if(!caller.hasRank(required)) {
+                    caller.getWrapped().sendMessage(RED + "You need the rank " + BLUE + required + RED + " to use this command!");
+                    return;
+                }
+            }
             final Parameter[] parameters = method.getParameters();
 
             final Object[] suppliedParameters = new Object[parameters.length];
@@ -141,14 +157,17 @@ public class CommandManager {
                         final Parameter parameter = parameters[i];
                         final Class<?> type = parameter.getType();
 
+                        boolean supplied = false;
                         final ArgumentBinding<?> binding = _bindings.get(type);
                         if(binding != null) {
                             final Optional<Class<? extends Annotation>> annotation = binding.getAnnotation();
-                            if(!annotation.isPresent() || (annotation.isPresent() && parameter.isAnnotationPresent(annotation.get())))
+                            if(!annotation.isPresent() || (annotation.isPresent() && parameter.isAnnotationPresent(annotation.get()))) {
                                 supply = binding.getArgumentProvider().get(parameter, arguments);
+                                supplied = true;
+                            }
                         }
 
-                        if(supply == null) {
+                        if(supply == null && !supplied) {
                             if(type.isAssignableFrom(String.class)) supply = arguments.safeNext().orElse(null);
                             else throw new RuntimeException("Cannot convert " + parameter.getType().getSimpleName() + " to required type.");
                         }
@@ -164,7 +183,7 @@ public class CommandManager {
                     .filter(Objects::nonNull)
                     .map(Optional::of)
                     .findFirst().flatMap(Function.identity());
-            if(failure.isPresent()) caller.getWrapped().sendMessage(ChatColor.RED + failure.get());
+            if(failure.isPresent()) caller.getWrapped().sendMessage(RED + failure.get());
             else method.invoke(object, suppliedParameters);
         } catch (IllegalAccessException | InvocationTargetException ex) {
             ex.printStackTrace();
@@ -189,24 +208,20 @@ public class CommandManager {
      * @param clazz The class to build the commands for
      */
     private void buildCommands(Class<? extends Commandable> clazz) {
-        try {
-            final Object commandObject = clazz.newInstance();
-            final Set<Method> commands = Arrays.stream(clazz.getDeclaredMethods())
-                    .filter(method -> method.isAnnotationPresent(Command.class))
-                    .peek(method -> method.setAccessible(true))
-                    .collect(Collectors.toSet());
-            final Set<Method> subcommands = Arrays.stream(clazz.getDeclaredMethods())
-                    .filter(method -> method.isAnnotationPresent(SubCommand.class))
-                    .peek(method -> method.setAccessible(true))
-                    .collect(Collectors.toSet());
-            commands.forEach(method -> {
-                final Command command = method.getAnnotation(Command.class);
-                _commands.put(command.name(), new CommandData(commandObject, command, method,
-                        getSubCommands(command.name(), subcommands)));
-            });
-        } catch (InstantiationException | IllegalAccessException e) {
-            e.printStackTrace();
-        }
+        final Object commandObject = _main.getInjector().getInstance(clazz);
+        final Set<Method> commands = Arrays.stream(clazz.getDeclaredMethods())
+                .filter(method -> method.isAnnotationPresent(Command.class))
+                .peek(method -> method.setAccessible(true))
+                .collect(Collectors.toSet());
+        final Set<Method> subcommands = Arrays.stream(clazz.getDeclaredMethods())
+                .filter(method -> method.isAnnotationPresent(SubCommand.class))
+                .peek(method -> method.setAccessible(true))
+                .collect(Collectors.toSet());
+        commands.forEach(method -> {
+            final Command command = method.getAnnotation(Command.class);
+            _commands.put(command.name(), new CommandData(commandObject, command, method,
+                    getSubCommands(command.name(), subcommands)));
+        });
     }
 
     /**
