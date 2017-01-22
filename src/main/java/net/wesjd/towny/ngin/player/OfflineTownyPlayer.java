@@ -60,7 +60,9 @@ public class OfflineTownyPlayer {
     OfflineTownyPlayer(StorageFolder storage, UUID uuid) {
         _storage = storage;
         _uuid = uuid;
+        System.out.println(">>>>>>>> previous rank: " + _rank);
         _storage.unbox(uuid.toString(), this);
+        System.out.println(">>>>>>>> after unboxing: " + _rank);
     }
 
     public UUID getUuid() {

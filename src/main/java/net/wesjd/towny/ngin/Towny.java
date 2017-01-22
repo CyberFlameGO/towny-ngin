@@ -6,10 +6,12 @@ import com.google.inject.Injector;
 import com.google.inject.Singleton;
 import net.milkbowl.vault.economy.Economy;
 import net.wesjd.towny.ngin.command.framework.CommandManager;
+import net.wesjd.towny.ngin.command.framework.argument.provider.EnumProvider;
 import net.wesjd.towny.ngin.command.framework.argument.verifier.RegexVerifier;
 import net.wesjd.towny.ngin.command.framework.argument.verifier.RequiredVerifier;
 import net.wesjd.towny.ngin.listeners.JoinLeaveListener;
 import net.wesjd.towny.ngin.player.PlayerManager;
+import net.wesjd.towny.ngin.player.Rank;
 import net.wesjd.towny.ngin.storage.GStorageModule;
 import net.wesjd.towny.ngin.util.economy.EconomyInjection;
 import org.bukkit.Bukkit;
@@ -18,6 +20,7 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.ServicePriority;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.io.File;
 import java.util.Arrays;
 
 public class Towny extends JavaPlugin {
@@ -28,6 +31,7 @@ public class Towny extends JavaPlugin {
                 @Override
                 protected void configure() {
                     bind(Towny.class).toInstance(Towny.this);
+
                     bind(PlayerManager.class).in(Singleton.class);
                     bind(CommandManager.class).in(Singleton.class);
                 }
@@ -38,11 +42,13 @@ public class Towny extends JavaPlugin {
     public void onEnable() {
         try {
             getDataFolder().mkdirs();
+            new File(getDataFolder(), "permissions").mkdirs();
             registerListeners(JoinLeaveListener.class);
 
             final CommandManager commandManager = _injector.getInstance(CommandManager.class);
             commandManager.addVerifier(Object.class, new RequiredVerifier());
             commandManager.addVerifier(String.class, new RegexVerifier());
+            commandManager.bind(Rank.class).toProvider(new EnumProvider<>());
 
             final Plugin vault = getServer().getPluginManager().getPlugin("Vault");
             getServer().getServicesManager().register(Economy.class, _injector.getInstance(EconomyInjection.class), vault, ServicePriority.Normal);

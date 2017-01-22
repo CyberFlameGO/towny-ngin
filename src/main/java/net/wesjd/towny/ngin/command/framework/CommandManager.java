@@ -38,9 +38,9 @@ import static org.bukkit.ChatColor.*;
 public class CommandManager {
 
     /**
-     * A main class instance, provided in the constructor
+     * A main class instance, provided in the constrcutor
      */
-    private Towny _main;
+    private final Towny _main;
 
     /**
      * A store of command names to their command data to save on lookup time
