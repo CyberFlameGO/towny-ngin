@@ -6,12 +6,12 @@ import net.wesjd.towny.ngin.command.framework.annotation.SubCommand;
 
 public class TestCommand implements Commandable {
 
-    @Command(name = "hello", desc = "yeet")
+    @Command(name = "hello")
     public void test() {
         System.out.println("asdfasdfasd IT WORKED 1");
     }
 
-    @SubCommand(of = "hello", name = "yeet", desc = "yeet2")
+    @SubCommand(of = "hello", name = "yeet")
     public void test2() {
         System.out.println("asdfasdfasd IT WORKED 2");
     }
