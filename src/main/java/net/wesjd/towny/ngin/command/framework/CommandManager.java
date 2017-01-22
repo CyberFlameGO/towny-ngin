@@ -140,7 +140,7 @@ public class CommandManager {
     private void invokeCommandMethod(Object object, Method method, TownyPlayer caller, Arguments arguments) {
         try {
             if(method.isAnnotationPresent(Requires.class)) {
-                final Rank required = method.getAnnotation(Requires.class).rank();
+                final Rank required = method.getAnnotation(Requires.class).value();
                 if(!caller.hasRank(required)) {
                     caller.getWrapped().sendMessage(RED + "You need the rank " + BLUE + required + RED + " to use this command!");
                     return;

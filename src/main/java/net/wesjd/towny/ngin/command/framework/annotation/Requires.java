@@ -15,6 +15,6 @@ public @interface Requires {
     /**
      * The required rank
      */
-    Rank rank();
+    Rank value();
 
 }
