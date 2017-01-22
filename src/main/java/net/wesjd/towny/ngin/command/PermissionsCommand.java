@@ -1,20 +1,24 @@
 package net.wesjd.towny.ngin.command;
 
 import com.google.inject.Inject;
-import com.sk89q.intake.Command;
-import com.sk89q.intake.Require;
-import li.l1t.common.intake.provider.annotation.Sender;
+import net.wesjd.towny.ngin.command.framework.Commandable;
+import net.wesjd.towny.ngin.command.framework.annotation.Command;
+import net.wesjd.towny.ngin.command.framework.annotation.Requires;
+import net.wesjd.towny.ngin.command.framework.annotation.SubCommand;
+import net.wesjd.towny.ngin.command.framework.annotation.parameter.Required;
 import net.wesjd.towny.ngin.player.PlayerManager;
 import net.wesjd.towny.ngin.player.Rank;
 import net.wesjd.towny.ngin.player.TownyPlayer;
 import org.bukkit.permissions.Permission;
+
+import java.util.Optional;
 
 import static org.bukkit.ChatColor.*;
 
 /**
  * All commands related to permissions
  */
-public class PermissionsCommand {
+public class PermissionsCommand implements Commandable {
 
     /**
      * An injected player manager
@@ -22,29 +26,37 @@ public class PermissionsCommand {
     @Inject
     private PlayerManager _playerManager;
 
-    @Command(aliases = "", desc = "Show your permissions")
-    public void showPermissions(@Sender TownyPlayer player) {
+    @Command(name = "permissions")
+    private void permissionsCommand(TownyPlayer player) {
         player.message(YELLOW + "You currently have the global rank of " + BLUE + player.getRank().toString() + YELLOW + ", which has the following permissions:");
         player.getRank().getPermissions().forEach(permission -> player.message(GOLD + " - " + RED + permission.getName()));
-        //TODO - show town permissions too?
     }
 
-    @Command(aliases = "add", desc = "Add a permission to a group", usage = "<permission> <group>", min = 2)
-    @Require("towny.permissions")
-    public void addPermission(@Sender TownyPlayer player, String permission, Rank group) {
-        if(group.getPermissions().add(new Permission(permission))) {
-            recalculatePermissionsFor(group);
-            player.message(GREEN + "Added the permission " + YELLOW + permission + GREEN + " to " + YELLOW + group);
-        } else player.message(RED + "Something went wrong.");
+    @SubCommand(of = "permissions", name = "add")
+    @Requires(Rank.ADMIN)
+    private void addPermissionCommand(TownyPlayer player,
+                                     @Required(fail = "Please supply a permission name.") String permission,
+                                     @Required(fail = "Please supply a valid rank.") Rank rank) {
+        if(rank.getPermissions().stream().noneMatch(perm -> perm.getName().equals(permission))) {
+            rank.getPermissions().add(new Permission(permission));
+            recalculatePermissionsFor(rank);
+            player.message(GREEN + "Added the permission " + YELLOW + permission + GREEN + " to " + YELLOW + rank);
+        } else player.message(RED + "That rank already has the permission of " + YELLOW + permission);
     }
 
-    @Command(aliases = "remove", desc = "Remove a permission from a group", usage = "<permission> <group>", min = 2)
-    @Require("towny.permissions")
-    public void removePermission(@Sender TownyPlayer player, String permission, Rank group) {
-        if(group.getPermissions().remove(new Permission(permission))) {
-            recalculatePermissionsFor(group);
-            player.message(GREEN + "Added the permission " + YELLOW + permission + GREEN + " to " + YELLOW + group);
-        } else player.message(RED + "Something went wrong. Perhaps that group didn't have that permission?");
+    @SubCommand(of = "permissions", name = "remove")
+    @Requires(Rank.ADMIN)
+    private void removePermissionsCommand(TownyPlayer player,
+                                          @Required(fail = "Please supply a permission name.") String permission,
+                                          @Required(fail = "Please supply a valid rank.") Rank rank) {
+        final Optional<Permission> matching = rank.getPermissions().stream()
+                .filter(perm -> perm.getName().equals(permission))
+                .findFirst();
+        if(matching.isPresent()) {
+            rank.getPermissions().remove(matching.get());
+            recalculatePermissionsFor(rank);
+            player.message(GREEN + "Removed the permission " + YELLOW + permission + GREEN + " from " + YELLOW + rank);
+        } else player.message(RED + "That rank doesn't already have the permission of " + YELLOW + permission);
     }
 
     /**
