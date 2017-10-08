@@ -1,7 +1,6 @@
 package net.wesjd.towny.ngin.command;
 
 import com.google.inject.Inject;
-import li.l1t.common.intake.provider.annotation.Sender;
 import mkremins.fanciful.FancyMessage;
 import net.wesjd.towny.ngin.command.framework.annotation.Command;
 import net.wesjd.towny.ngin.command.framework.annotation.SubCommand;
@@ -10,17 +9,13 @@ import net.wesjd.towny.ngin.player.PlayerManager;
 import net.wesjd.towny.ngin.player.TownyPlayer;
 import net.wesjd.towny.ngin.town.Town;
 import net.wesjd.towny.ngin.town.TownManager;
-import net.wesjd.towny.ngin.town.TownPermissions;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.permissions.Permission;
 
 import java.text.NumberFormat;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static org.bukkit.ChatColor.*;
