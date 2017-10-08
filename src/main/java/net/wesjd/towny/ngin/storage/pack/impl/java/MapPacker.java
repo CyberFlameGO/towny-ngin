@@ -1,6 +1,7 @@
 package net.wesjd.towny.ngin.storage.pack.impl.java;
 
 import com.google.inject.Inject;
+import net.wesjd.towny.ngin.storage.InheritSuperPacker;
 import net.wesjd.towny.ngin.storage.pack.Packer;
 import net.wesjd.towny.ngin.storage.pack.PackerStore;
 import org.msgpack.core.MessagePacker;
@@ -13,7 +14,7 @@ import java.util.Map;
 public class MapPacker extends Packer<Map> {
 
     @Inject
-    private PackerStore _packerStore;
+    private PackerStore packerStore;
 
     @SuppressWarnings("unchecked")
     @Override
@@ -25,8 +26,12 @@ public class MapPacker extends Packer<Map> {
             if (keyPacker == null) {
                 Class key = entry.getKey().getClass(), value = entry.getValue().getClass();
 
-                keyPacker = _packerStore.lookup(key).orElseThrow(() -> new RuntimeException("Unable to find packer key type " + key));
-                valuePacker = _packerStore.lookup(value).orElseThrow(() -> new RuntimeException("Unable to find packer for value type " + value));
+                while (key.isAnnotationPresent(InheritSuperPacker.class)) key = key.getSuperclass();
+                while (value.isAnnotationPresent(InheritSuperPacker.class)) value = value.getSuperclass();
+
+                Class finalKey = key, finalValue = value;
+                keyPacker = packerStore.lookup(key).orElseThrow(() -> new RuntimeException("Unable to find packer key type " + finalKey));
+                valuePacker = packerStore.lookup(value).orElseThrow(() -> new RuntimeException("Unable to find packer for value type " + finalValue));
 
                 packer.packString(key.getName());
                 packer.packString(value.getName());
@@ -46,13 +51,13 @@ public class MapPacker extends Packer<Map> {
             if (keyUnpacker == null) {
                 String key = unpacker.unpackString(), value = unpacker.unpackString();
                 try {
-                    keyUnpacker = _packerStore.lookup(Class.forName(key)).orElseThrow(() -> new RuntimeException("Unable to find packer for key type " + key));
+                    keyUnpacker = packerStore.lookup(Class.forName(key)).orElseThrow(() -> new RuntimeException("Unable to find packer for key type " + key));
                 } catch (ClassNotFoundException e) {
                     throw new RuntimeException("Unable to find key class " + key);
                 }
 
                 try {
-                    valueUnpacker = _packerStore.lookup(Class.forName(value)).orElseThrow(() -> new RuntimeException("Unable to find packer for value type " + value));
+                    valueUnpacker = packerStore.lookup(Class.forName(value)).orElseThrow(() -> new RuntimeException("Unable to find packer for value type " + value));
                 } catch (ClassNotFoundException e) {
                     throw new RuntimeException("Unable to find value class " + value);
                 }

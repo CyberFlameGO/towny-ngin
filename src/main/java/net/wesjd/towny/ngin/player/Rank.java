@@ -1,7 +1,6 @@
 package net.wesjd.towny.ngin.player;
 
 import com.google.common.io.Files;
-import org.apache.commons.io.Charsets;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.permissions.Permission;
@@ -9,9 +8,7 @@ import org.bukkit.permissions.Permission;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 /**
@@ -27,40 +24,43 @@ public enum Rank {
     /**
      * The rank's chat prefix
      */
-    private final String _prefix;
+    private final String prefix;
     /**
      * The rank's prefix color
      */
-    private final ChatColor _color;
+    private final ChatColor color;
 
     /**
      * Contains all the permissions for this rank
      */
-    private final Set<Permission> _permissions = new HashSet<>();
+    private final Set<Permission> permissions = new HashSet<>();
 
     Rank(String prefix, ChatColor color) {
-        this._prefix = prefix;
-        this._color = color;
+        this.prefix = prefix;
+        this.color = color;
 
         try {
-            final File permissionsFile = new File(Bukkit.getPluginManager().getPlugin("ngin").getDataFolder(), "permissions/" + toString().toLowerCase());
+            File permissionsFolder = new File(Bukkit.getPluginManager().getPlugin("ngin").getDataFolder(), "permissions");
+            if(!permissionsFolder.exists()) permissionsFolder.mkdir();
+
+            final File permissionsFile = new File(permissionsFolder, toString().toLowerCase());
             if (!permissionsFile.exists()) permissionsFile.createNewFile();
-            Files.readLines(permissionsFile, StandardCharsets.UTF_8).forEach(line -> _permissions.add(new Permission(line)));
+            Files.readLines(permissionsFile, StandardCharsets.UTF_8).forEach(line -> permissions.add(new Permission(line)));
         } catch (IOException ex) {
             ex.printStackTrace();
         }
     }
 
     public String getPrefix() {
-        return _prefix;
+        return prefix;
     }
 
     public ChatColor getColor() {
-        return _color;
+        return color;
     }
 
     public Set<Permission> getPermissions() {
-        return _permissions;
+        return permissions;
     }
 
 }

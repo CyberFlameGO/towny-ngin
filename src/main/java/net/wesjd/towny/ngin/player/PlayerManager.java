@@ -6,6 +6,7 @@ import com.google.common.cache.LoadingCache;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 import net.wesjd.towny.ngin.storage.StorageFolder;
+import net.wesjd.towny.ngin.town.TownManager;
 import net.wesjd.towny.ngin.util.UUIDFetcher;
 import org.apache.commons.lang.Validate;
 import org.bukkit.entity.Player;
@@ -23,17 +24,22 @@ public class PlayerManager {
      * The injected {@link StorageFolder} for players
      */
     @Inject @Named("players")
-    private StorageFolder _storage;
+    private StorageFolder storage;
+    /**
+     * The injected {@link TownManager}
+     */
+    @Inject
+    private TownManager townManager;
 
     /**
      * {@link UUID} to {@link TownyPlayer} store
      */
-    private final Map<UUID, TownyPlayer> _store = new HashMap<>();
+    private final Map<UUID, TownyPlayer> store = new HashMap<>();
 
     /**
      * A simple name to uuid cache
      */
-    private final LoadingCache<String, UUID> _nameCache = CacheBuilder.newBuilder()
+    private final LoadingCache<String, UUID> nameCache = CacheBuilder.newBuilder()
             .expireAfterAccess(3, TimeUnit.MINUTES)
             .maximumSize(200)
             .build(new CacheLoader<String, UUID>() {
@@ -51,7 +57,7 @@ public class PlayerManager {
      */
     public UUID getUUIDFor(String name) {
         try {
-            return _nameCache.get(name);
+            return nameCache.get(name);
         } catch (ExecutionException ex) {
             throw new RuntimeException(ex);
         }
@@ -64,7 +70,7 @@ public class PlayerManager {
      * @return The created {@link OfflineTownyPlayer}
      */
     public OfflineTownyPlayer createOfflineTownyPlayer(UUID uuid) {
-        return new OfflineTownyPlayer(_storage, uuid);
+        return new OfflineTownyPlayer(storage, townManager, uuid);
     }
 
     /**
@@ -73,8 +79,8 @@ public class PlayerManager {
      * @param player The {@link Player} to create a wrapper for
      */
     public TownyPlayer initializePlayer(Player player, OfflineTownyPlayer offline) {
-        Validate.isTrue(!_store.containsKey(offline.getUuid()));
-        return _store.put(offline.getUuid(), new TownyPlayer(player, _storage, offline));
+        Validate.isTrue(!store.containsKey(offline.getUuid()));
+        return store.put(offline.getUuid(), new TownyPlayer(player, storage, offline));
     }
 
     /**
@@ -84,7 +90,7 @@ public class PlayerManager {
      * @return The wrapper
      */
     public TownyPlayer getPlayer(Player player) {
-        return _store.get(player.getUniqueId());
+        return store.get(player.getUniqueId());
     }
 
     /**
@@ -94,7 +100,7 @@ public class PlayerManager {
      * @return The wrapper
      */
     public TownyPlayer getPlayer(UUID uuid) {
-        return _store.get(uuid);
+        return store.get(uuid);
     }
 
     /**
@@ -103,7 +109,7 @@ public class PlayerManager {
      * @param player The {@link Player} to remove
      */
     public void removePlayer(Player player) {
-        _store.remove(player.getUniqueId()).save();
+        store.remove(player.getUniqueId()).save();
     }
 
     /**
@@ -112,7 +118,14 @@ public class PlayerManager {
      * @return A collection containing all online players
      */
     public Collection<TownyPlayer> getOnlinePlayers() {
-        return Collections.unmodifiableCollection(_store.values());
+        return Collections.unmodifiableCollection(store.values());
+    }
+
+    /**
+     * Saves the currently loaded players
+     */
+    public void saveLoaded() {
+        store.values().forEach(TownyPlayer::save);
     }
 
 }

@@ -14,11 +14,11 @@ public class ArgumentBinding<T> {
     /**
      * The argument's provider
      */
-    private final ArgumentProvider<T> _argumentProvider;
+    private final ArgumentProvider<T> argumentProvider;
     /**
      * The arguments specific annotation
      */
-    private final Class<? extends Annotation> _annotation;
+    private final Class<? extends Annotation> annotation;
 
     /**
      * Store some data on an argument binding
@@ -27,16 +27,16 @@ public class ArgumentBinding<T> {
      * @param annotation The optional annotation for this binding
      */
     public ArgumentBinding(ArgumentProvider<T> argumentProvider, Class<? extends Annotation> annotation) {
-        _argumentProvider = argumentProvider;
-        _annotation = annotation;
+        this.argumentProvider = argumentProvider;
+        this.annotation = annotation;
     }
 
     public ArgumentProvider<T> getArgumentProvider() {
-        return _argumentProvider;
+        return argumentProvider;
     }
 
     public Optional<Class<? extends Annotation>> getAnnotation() {
-        return Optional.ofNullable(_annotation);
+        return Optional.ofNullable(annotation);
     }
 
     /**
@@ -47,12 +47,12 @@ public class ArgumentBinding<T> {
         /**
          * The callback after the builder finishes
          */
-        private final Consumer<ArgumentBinding<?>> _callback;
+        private final Consumer<ArgumentBinding<?>> callback;
 
         /**
          * The argument's annotation
          */
-        private Class<? extends Annotation> _annotation;
+        private Class<? extends Annotation> annotation;
 
         /**
          * Starts a builder
@@ -60,7 +60,7 @@ public class ArgumentBinding<T> {
          * @param callback The callback with the result
          */
         public Builder(Consumer<ArgumentBinding<?>> callback) {
-            _callback = callback;
+            this.callback = callback;
         }
 
         /**
@@ -70,7 +70,7 @@ public class ArgumentBinding<T> {
          * @return The builder for later use
          */
         public Builder annotatedWith(Class<? extends Annotation> annotation) {
-            _annotation = annotation;
+            this.annotation = annotation;
             return this;
         }
 
@@ -80,7 +80,7 @@ public class ArgumentBinding<T> {
          * @param argumentProvider The provider
          */
         public <I> void toProvider(ArgumentProvider<I> argumentProvider) {
-            _callback.accept(new ArgumentBinding<>(argumentProvider, _annotation));
+            callback.accept(new ArgumentBinding<>(argumentProvider, annotation));
         }
 
         /**
