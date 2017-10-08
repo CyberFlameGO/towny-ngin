@@ -13,7 +13,7 @@ import java.io.IOException;
 public class RegionPacker extends Packer<Region> {
 
     @Inject
-    private PackerStore _packerStore;
+    private PackerStore packerStore;
 
     @Override
     public void packup(Region packing, MessagePacker packer) throws IOException {
@@ -31,6 +31,6 @@ public class RegionPacker extends Packer<Region> {
     }
 
     private LocationPacker getLocationPacker() {
-        return (LocationPacker) _packerStore.lookup(Location.class).orElseThrow(() -> new RuntimeException("Unable to find packer for Location"));
+        return (LocationPacker) packerStore.lookup(Location.class).orElseThrow(() -> new RuntimeException("Unable to find packer for Location"));
     }
 }

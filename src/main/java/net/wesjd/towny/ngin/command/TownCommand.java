@@ -1,12 +1,11 @@
 package net.wesjd.towny.ngin.command;
 
 import com.google.inject.Inject;
-import com.sk89q.intake.Command;
-import com.sk89q.intake.parametric.annotation.Optional;
-import com.sk89q.intake.parametric.annotation.Text;
-import com.sk89q.intake.parametric.annotation.Validate;
 import li.l1t.common.intake.provider.annotation.Sender;
 import mkremins.fanciful.FancyMessage;
+import net.wesjd.towny.ngin.command.framework.annotation.Command;
+import net.wesjd.towny.ngin.command.framework.annotation.SubCommand;
+import net.wesjd.towny.ngin.command.framework.annotation.parameter.Regex;
 import net.wesjd.towny.ngin.player.PlayerManager;
 import net.wesjd.towny.ngin.player.TownyPlayer;
 import net.wesjd.towny.ngin.town.Town;
@@ -40,29 +39,35 @@ public class TownCommand {
      * An injected town manager
      */
     @Inject
-    private TownManager _townManager;
+    private TownManager townManager;
     /**
      * An injected player manager
      */
     @Inject
-    private PlayerManager _playerManager;
+    private PlayerManager playerManager;
 
-    @Command(aliases = "create", usage = "<town name>", desc = "Creates a new town", min = 1)
-    public void createTownCommand(@Sender TownyPlayer player, @Validate(regex = "^(\\w{1,16})$") String name) {
-        if (_townManager.getTownSafely(name).isPresent()) {
+    @Command(name = "town")
+    public void onTownCommand(TownyPlayer player) {
+
+    }
+
+    @SubCommand(of = "town", name = "create")
+    public void handleTown(TownyPlayer player,
+                           @Regex(exp = "^(\\w{1,16})$", fail = "Please supply a valid town name, 1-16 characters.") String name) {
+        if (townManager.getTownSafely(name).isPresent()) {
             player.message(RED + "A town with the name " + name + " already exists");
         } else {
-            final Town newTown = _townManager.createTown(name);
+            final Town newTown = townManager.createTown(name);
             newTown.generateDefaultRanks(player);
-            _townManager.addTown(newTown);
+            townManager.addTown(newTown);
             player.setTown(newTown);
 
             player.message(GREEN + "Created a town with the name of " + YELLOW + name + GREEN + "!");
         }
     }
 
-    @Command(aliases = "info", desc = "Shows your town info")
-    public void getTownInfo(@Sender TownyPlayer player) {
+    @SubCommand(of = "town", name = "info")
+    public void handleTownInfo(TownyPlayer player) {
         if (player.getTown() == null) player.message(RED + "You aren't a part of any town!");
         else {
             final Town town = player.getTown();
@@ -79,8 +84,38 @@ public class TownCommand {
         }
     }
 
-    @Command(aliases = "warp", desc = "Configures town warps")
-    public void handleWarp(@Sender TownyPlayer player, @Text @Optional String argsConcated) {
+    @SubCommand(of = "town", name = "warp")
+    public void handleWarp(TownyPlayer player,
+                           @Regex(exp = "^(\\w{1,16})$", fail = "Please supply a valid warp name, 1-16 characters.") String warpName) {
+        if(player.getTown() == null) player.message(ChatColor.RED + "You aren't apart of any town");
+        else {
+
+        }
+    }
+
+    @SubCommand(of = "town warp", name = "create")
+    public void handleWarpCreate(TownyPlayer player,
+                                 @Regex(exp = "^(\\w{1,16})$", fail = "Please supply a valid warp name, 1-16 characters.") String warpName) {
+        if(player.getTown() == null) player.message(ChatColor.RED + "You aren't apart of any town");
+        else {
+
+        }
+    }
+
+    @SubCommand(of = "town warp", name ="remove")
+    public void handleWarpRemove(TownyPlayer player,
+                                 @Regex(exp = "^(\\w{1,16})$", fail = "Please supply a valid warp name, 1-16 characters.") String warpName) {
+
+    }
+
+    @SubCommand(of = "town warp", name = "rename")
+    public void handleWarpRename(TownyPlayer player,
+                                 @Regex(exp = "^(\\w{1,16})$", fail = "Please supply a valid warp name, 1-16 characters.") String warpName) {
+
+    }
+
+    /*@Command(aliases = "warp", desc = "Configures town warps")
+    public void handleWarp2(@Sender TownyPlayer player, String argsConcated) {
         if (player.getTown() == null) player.message(ChatColor.RED + "You aren't apart of any town");
         else {
             String[] args = argsConcated == null ? new String[0] : argsConcated.split(" ");
@@ -146,7 +181,7 @@ public class TownCommand {
                 }
             }
         }
-    }
+    }*/
 
     private FancyMessage getFancyFor(TownyPlayer player, String name, String help, Permission permission) {
         return hasPermission(player, permission) ? new FancyMessage(" - ").color(GOLD)

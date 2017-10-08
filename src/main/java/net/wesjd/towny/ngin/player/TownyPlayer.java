@@ -1,7 +1,6 @@
 package net.wesjd.towny.ngin.player;
 
 import net.wesjd.towny.ngin.storage.StorageFolder;
-import net.wesjd.towny.ngin.town.TownManager;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.permissions.PermissionAttachment;
@@ -14,11 +13,11 @@ public class TownyPlayer extends OfflineTownyPlayer {
     /**
      * The wrapped online player
      */
-    private final Player _wrapped;
+    private final Player wrapped;
     /**
      * The attachment for the player, used to give their rank permissions
      */
-    private final PermissionAttachment _attachment;
+    private final PermissionAttachment attachment;
 
     /**
      * Creates an online player wrapper
@@ -29,17 +28,17 @@ public class TownyPlayer extends OfflineTownyPlayer {
      */
     TownyPlayer(Player wrapped, StorageFolder storage, OfflineTownyPlayer offline) {
         super(storage, offline);
-        _wrapped = wrapped;
-        _attachment = new PermissionAttachment(Bukkit.getPluginManager().getPlugin("ngin"), _wrapped);
+        this.wrapped = wrapped;
+        attachment = new PermissionAttachment(Bukkit.getPluginManager().getPlugin("ngin"), this.wrapped);
         setLastKnownName(wrapped.getName());
         setRank(getRank()); //to give the player their permissions
     }
 
     @Override
     public void setRank(Rank rank) {
-        getRank().getPermissions().forEach(_attachment::unsetPermission);
+        getRank().getPermissions().forEach(attachment::unsetPermission);
         super.setRank(rank);
-        rank.getPermissions().forEach(perm -> _attachment.setPermission(perm, true));
+        rank.getPermissions().forEach(perm -> attachment.setPermission(perm, true));
     }
 
     /**
@@ -48,11 +47,11 @@ public class TownyPlayer extends OfflineTownyPlayer {
      * @param message The message to send the player
      */
     public void message(String message) {
-        _wrapped.sendMessage(message);
+        wrapped.sendMessage(message);
     }
 
     public Player getWrapped() {
-        return _wrapped;
+        return wrapped;
     }
 
 }

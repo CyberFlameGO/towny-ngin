@@ -15,7 +15,7 @@ public class Region {
     /**
      * The two locations that represent the confines of this box
      */
-    private Location _pos1, _pos2;
+    private Location pos1, pos2;
 
     /**
      * Constructs a new box with the
@@ -31,12 +31,12 @@ public class Region {
      * @param z2 The maximum z coordinate
      */
     public Region(World world, double x1, double y1, double z1, double x2, double y2, double z2) {
-        double _minX = Math.min(x1, x2), _minY = Math.min(y1, y2), _minZ = Math.min(z1, z2);
+        double minX = Math.min(x1, x2), minY = Math.min(y1, y2), minZ = Math.min(z1, z2);
 
-        double _maxX = Math.max(x1, x2), _maxY = Math.max(y1, y2), _maxZ = Math.max(z1, z2);
+        double maxX = Math.max(x1, x2), maxY = Math.max(y1, y2), maxz = Math.max(z1, z2);
 
-        _pos1 = new Location(world, _minX, _minY, _minZ);
-        _pos2 = new Location(world, _maxX, _maxY, _maxZ);
+        pos1 = new Location(world, minX, minY, minZ);
+        pos2 = new Location(world, maxX, maxY, maxz);
     }
 
     /**
@@ -52,11 +52,11 @@ public class Region {
     }
 
     public Location getPos1() {
-        return _pos1;
+        return pos1;
     }
 
     public Location getPos2() {
-        return _pos2;
+        return pos2;
     }
 
     /**
@@ -68,10 +68,10 @@ public class Region {
      */
     public List<Location> getAllBlocks() {
         List<Location> ret = new ArrayList<>();
-        for (int x = _pos1.getBlockX(); x <= _pos2.getBlockX(); x++) {
-            for (int y = _pos1.getBlockY(); y <= _pos2.getBlockY(); y++) {
-                for (int z = _pos1.getBlockZ(); z <= _pos2.getBlockZ(); z++) {
-                    ret.add(new Location(_pos1.getWorld(), x, y, z));
+        for (int x = pos1.getBlockX(); x <= pos2.getBlockX(); x++) {
+            for (int y = pos1.getBlockY(); y <= pos2.getBlockY(); y++) {
+                for (int z = pos1.getBlockZ(); z <= pos2.getBlockZ(); z++) {
+                    ret.add(new Location(pos1.getWorld(), x, y, z));
                 }
             }
         }
@@ -85,7 +85,7 @@ public class Region {
      * @return Whether the two boxes intersect
      */
     public boolean intersectsWith(Region other) {
-        return this.intersectsWith(other._pos1.getX(), other._pos1.getY(), other._pos1.getZ(), other._pos2.getX(), other._pos2.getY(), other._pos2.getZ());
+        return this.intersectsWith(other.pos1.getX(), other.pos1.getY(), other.pos1.getZ(), other.pos2.getX(), other.pos2.getY(), other.pos2.getZ());
     }
 
     /**
@@ -100,7 +100,7 @@ public class Region {
      * @return Whether this box and the two corners intercept
      */
     public boolean intersectsWith(double minX, double minY, double minZ, double maxX, double maxY, double maxZ) {
-        return this._pos1.getX() < maxX && this._pos2.getX() > minX && this._pos1.getY() < maxY && this._pos2.getY() > minY && this._pos1.getZ() < maxZ && this._pos2.getZ() > minZ;
+        return this.pos1.getX() < maxX && this.pos2.getX() > minX && this.pos1.getY() < maxY && this.pos2.getY() > minY && this.pos1.getZ() < maxZ && this.pos2.getZ() > minZ;
     }
 
     /**

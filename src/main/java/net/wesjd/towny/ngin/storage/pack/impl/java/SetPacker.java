@@ -14,7 +14,7 @@ import java.util.Set;
 public class SetPacker extends Packer<Set> {
 
     @Inject
-    private PackerStore _packerStore;
+    private PackerStore packerStore;
 
     @Override
     public void packup(Set packing, MessagePacker packer) throws IOException {
@@ -28,7 +28,7 @@ public class SetPacker extends Packer<Set> {
                 Class cl = p.getClass();
                 while (cl.isAnnotationPresent(InheritSuperPacker.class)) cl = cl.getSuperclass();
 
-                elementPacker = _packerStore.lookup(cl).orElseThrow(
+                elementPacker = packerStore.lookup(cl).orElseThrow(
                         () -> new RuntimeException("Unable to find packer for type " + p.getClass() + " in Set"));
 
                 packer.packString(cl.getName());
@@ -48,7 +48,7 @@ public class SetPacker extends Packer<Set> {
                 String read = unpacker.unpackString();
                 try {
 
-                    elementUnpacker = _packerStore.lookup(Class.forName(read)).orElseThrow(() -> new RuntimeException("Unable to find packer for type " + read));
+                    elementUnpacker = packerStore.lookup(Class.forName(read)).orElseThrow(() -> new RuntimeException("Unable to find packer for type " + read));
                 } catch (ClassNotFoundException e) {
                     throw new RuntimeException("Unable to find class " + read);
                 }

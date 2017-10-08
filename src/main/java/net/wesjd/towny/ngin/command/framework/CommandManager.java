@@ -40,27 +40,27 @@ public class CommandManager {
     /**
      * A main class instance, provided in the constrcutor
      */
-    private final Towny _main;
+    private final Towny main;
 
     /**
      * A store of command names to their command data to save on lookup time
      */
-    private final Map<String, CommandData> _commands = new HashMap<>();
+    private final Map<String, CommandData> commands = new HashMap<>();
     /**
      * A store of argument types to their bindings
      */
-    private final Map<Class<?>, ArgumentBinding<?>> _bindings = new HashMap<>();
+    private final Map<Class<?>, ArgumentBinding<?>> bindings = new HashMap<>();
     /**
      * A store of argument types to verifiers
      */
-    private final Multimap<Class<?>, ArgumentVerifier> _verifiers = ArrayListMultimap.create();
+    private final Multimap<Class<?>, ArgumentVerifier> verifiers = ArrayListMultimap.create();
 
     /**
      * Loads all of the commandables
      */
     @Inject
     public CommandManager(Towny main, PlayerManager playerManager) {
-        _main = main;
+        this.main = main;
         new Reflections("net.wesjd.towny.ngin.command").getSubTypesOf(Commandable.class).forEach(this::buildCommands);
         Bukkit.getPluginManager().registerEvents(new Listener() {
             @EventHandler
@@ -82,7 +82,7 @@ public class CommandManager {
      * @param verifier The verifier itself
      */
     public <T> void addVerifier(Class<T> type, ArgumentVerifier<T> verifier) {
-        _verifiers.put(type, verifier);
+        verifiers.put(type, verifier);
     }
 
     /**
@@ -92,7 +92,7 @@ public class CommandManager {
      * @return A binding builder
      */
     public ArgumentBinding.Builder bind(Class<?> type) {
-        return new ArgumentBinding.Builder((binding) -> _bindings.put(type, binding));
+        return new ArgumentBinding.Builder((binding) -> bindings.put(type, binding));
     }
 
     /**
@@ -103,7 +103,7 @@ public class CommandManager {
      * @return Weather the command successfully executed
      */
     public boolean callCommand(TownyPlayer caller, String calledCommand, String[] providedArguments) {
-        final CommandData command = _commands.get(calledCommand);
+        final CommandData command = commands.get(calledCommand);
         if(command != null) {
             final Arguments arguments = new Arguments(providedArguments);
             final SubCommandData topSubcommand = getTopSubcommand(calledCommand, arguments, null, command.getSubcommands());
@@ -158,7 +158,7 @@ public class CommandManager {
                         final Class<?> type = parameter.getType();
 
                         boolean supplied = false;
-                        final ArgumentBinding<?> binding = _bindings.get(type);
+                        final ArgumentBinding<?> binding = bindings.get(type);
                         if(binding != null) {
                             final Optional<Class<? extends Annotation>> annotation = binding.getAnnotation();
                             if(!annotation.isPresent() || (annotation.isPresent() && parameter.isAnnotationPresent(annotation.get()))) {
@@ -197,8 +197,8 @@ public class CommandManager {
      * @return A stream of the found verifiers
      */
     private Stream<ArgumentVerifier> getVerifiersFor(Class<?> type) {
-        final Collection<ArgumentVerifier> verifiers = _verifiers.get(type);
-        verifiers.addAll(_verifiers.get(Object.class));
+        final Collection<ArgumentVerifier> verifiers = this.verifiers.get(type);
+        verifiers.addAll(this.verifiers.get(Object.class));
         return verifiers.stream();
     }
 
@@ -208,7 +208,7 @@ public class CommandManager {
      * @param clazz The class to build the commands for
      */
     private void buildCommands(Class<? extends Commandable> clazz) {
-        final Object commandObject = _main.getInjector().getInstance(clazz);
+        final Object commandObject = main.getInjector().getInstance(clazz);
         final Set<Method> commands = Arrays.stream(clazz.getDeclaredMethods())
                 .filter(method -> method.isAnnotationPresent(Command.class))
                 .peek(method -> method.setAccessible(true))
@@ -219,7 +219,7 @@ public class CommandManager {
                 .collect(Collectors.toSet());
         commands.forEach(method -> {
             final Command command = method.getAnnotation(Command.class);
-            _commands.put(command.name(), new CommandData(commandObject, command, method,
+            this.commands.put(command.name(), new CommandData(commandObject, command, method,
                     getSubCommands(command.name(), subcommands)));
         });
     }
@@ -251,19 +251,19 @@ public class CommandManager {
         /**
          * The actual command class
          */
-        private final Object _object;
+        private final Object object;
         /**
          * The command annoatation (and data) itself
          */
-        private final Command _command;
+        private final Command command;
         /**
          * The method to call the command upon
          */
-        private final Method _method;
+        private final Method method;
         /**
          * All of the subcommands for this command
          */
-        private final Set<SubCommandData> _subcommands;
+        private final Set<SubCommandData> subcommands;
 
         /**
          * Stores some command data
@@ -274,26 +274,26 @@ public class CommandManager {
          * @param subcommands All of the subcommands
          */
         public CommandData(Object object, Command command, Method method, Set<SubCommandData> subcommands) {
-            _object = object;
-            _command = command;
-            _method = method;
-            _subcommands = subcommands;
+            this.object = object;
+            this.command = command;
+            this.method = method;
+            this.subcommands = subcommands;
         }
 
         public Object getClassInstance() {
-            return _object;
+            return object;
         }
 
         public Command getAnnotation() {
-            return _command;
+            return command;
         }
 
         public Method getMethod() {
-            return _method;
+            return method;
         }
 
         public Set<SubCommandData> getSubcommands() {
-            return Collections.unmodifiableSet(_subcommands);
+            return Collections.unmodifiableSet(subcommands);
         }
 
     }
@@ -306,15 +306,15 @@ public class CommandManager {
         /**
          * The subcommand's annoation (and data)
          */
-        private final SubCommand _subcommand;
+        private final SubCommand subcommand;
         /**
          * The method to call the command upon
          */
-        private final Method _method;
+        private final Method method;
         /**
          * All of the subcommands for this subcommand
          */
-        private final Set<SubCommandData> _subcommands;
+        private final Set<SubCommandData> subcommands;
 
         /**
          * Stores some subcommand data
@@ -324,21 +324,21 @@ public class CommandManager {
          * @param subcommands All of the subcommands
          */
         public SubCommandData(SubCommand subcommand, Method method, Set<SubCommandData> subcommands) {
-            _subcommand = subcommand;
-            _method = method;
-            _subcommands = subcommands;
+            this.subcommand = subcommand;
+            this.method = method;
+            this.subcommands = subcommands;
         }
 
         public SubCommand getAnnotation() {
-            return _subcommand;
+            return subcommand;
         }
 
         public Method getMethod() {
-            return _method;
+            return method;
         }
 
         public Set<SubCommandData> getSubcommands() {
-            return Collections.unmodifiableSet(_subcommands);
+            return Collections.unmodifiableSet(subcommands);
         }
 
     }

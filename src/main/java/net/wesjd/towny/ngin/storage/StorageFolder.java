@@ -32,19 +32,19 @@ public class StorageFolder {
     /**
      * The injected {@link Towny} instance
      */
-    private Towny _towny;
+    private Towny towny;
     /**
      * The injected {@link PackerStore} containing all {@link Packer} implementations
      */
-    private PackerStore _packerStore;
+    private PackerStore packerStore;
     /**
      * The folder all files are stored in
      */
-    private File _folder;
+    private File folder;
     /**
      * A {@link LoadingCache} containing a {@link List<Field>} for a specified {@link Class}
      */
-    private final LoadingCache<Class, List<Field>> _fieldCache = CacheBuilder.newBuilder()
+    private final LoadingCache<Class, List<Field>> fieldCache = CacheBuilder.newBuilder()
             .expireAfterAccess(1, TimeUnit.MINUTES)
             .build(new CacheLoader<Class, List<Field>>() {
                 @Override
@@ -55,7 +55,7 @@ public class StorageFolder {
                             .filter(f -> f.isAnnotationPresent(Data.class))
                             .peek(f -> f.setAccessible(true))
                             .collect(Collectors.toList());
-                    if(key.getSuperclass() != Object.class) fields.addAll(_fieldCache.get(key.getSuperclass()));
+                    if(key.getSuperclass() != Object.class) fields.addAll(fieldCache.get(key.getSuperclass()));
                     return fields;
                 }
             });
@@ -68,10 +68,10 @@ public class StorageFolder {
      * @param folder      The folder to store files in
      */
     public StorageFolder(Towny towny, PackerStore packerStore, String folder) {
-        _towny = towny;
-        _packerStore = packerStore;
-        _folder = new File(_towny.getDataFolder(), folder);
-        _folder.mkdir();
+        this.towny = towny;
+        this.packerStore = packerStore;
+        this.folder = new File(this.towny.getDataFolder(), folder);
+        this.folder.mkdir();
     }
 
     /**
@@ -87,14 +87,14 @@ public class StorageFolder {
         try {
             MessageBufferPacker packer = MessagePack.newDefaultBufferPacker();
 
-            List<Field> fields = _fieldCache.get(packable.getClass());
+            List<Field> fields = fieldCache.get(packable.getClass());
             packer.packArrayHeader(fields.size());
 
             for (Field field : fields) {
                 Class cl = field.getType();
                 while (cl.isAnnotationPresent(InheritSuperPacker.class)) cl = cl.getSuperclass();
 
-                Packer p = _packerStore.lookup(cl).orElseThrow(() -> new PackException("Unable to find packer for type " + field.getType()));
+                Packer p = packerStore.lookup(cl).orElseThrow(() -> new PackException("Unable to find packer for type " + field.getType()));
                 try {
                     packer.packString(field.getName());
                     Object obj = field.get(packable);
@@ -109,7 +109,7 @@ public class StorageFolder {
 
             packer.close();
 
-            FileUtils.copyInputStreamToFile(new ByteArrayInputStream(packer.toByteArray()), new File(_folder, name));
+            FileUtils.copyInputStreamToFile(new ByteArrayInputStream(packer.toByteArray()), new File(folder, name));
         } catch (IOException | ExecutionException e) {
             throw new PackException("Packing " + packable.getClass(), e);
         }
@@ -125,19 +125,19 @@ public class StorageFolder {
      */
     public void unbox(String name, Object packable) throws PackException {
         try {
-            File file = new File(_folder, name);
+            File file = new File(folder, name);
             if (file.exists()) {
 
                 MessageUnpacker unpacker = MessagePack.newDefaultUnpacker(new FileInputStream(file));
 
-                List<Field> fields = _fieldCache.get(packable.getClass());
+                List<Field> fields = fieldCache.get(packable.getClass());
 
                 int amount = unpacker.unpackArrayHeader();
                 for (int i = 0; i < amount; i++) {
                     String field = unpacker.unpackString();
                     Field f = findField(fields, field)
                             .orElseGet(() -> {
-                                _towny.getLogger().warning("Unable to find field " + field + " in " + packable.getClass());
+                                towny.getLogger().warning("Unable to find field " + field + " in " + packable.getClass());
                                 return null;
                             });
                     if (f != null) {
@@ -145,7 +145,7 @@ public class StorageFolder {
                             Class cl = f.getType();
                             while (cl.isAnnotationPresent(InheritSuperPacker.class)) cl = cl.getSuperclass();
 
-                            f.set(packable, _packerStore.lookup(cl)
+                            f.set(packable, packerStore.lookup(cl)
                                     .orElseThrow(() -> new PackException("Unable to find packer for type " + f.getType())).unbox(unpacker));
                         }
                     }
@@ -162,7 +162,7 @@ public class StorageFolder {
      * @return
      */
     public File[] getAllFiles() {
-        return _folder.listFiles();
+        return folder.listFiles();
     }
 
     /**

@@ -24,7 +24,7 @@ public class PermissionsCommand implements Commandable {
      * An injected player manager
      */
     @Inject
-    private PlayerManager _playerManager;
+    private PlayerManager playerManager;
 
     @Command(name = "permissions")
     private void permissionsCommand(TownyPlayer player) {
@@ -65,7 +65,7 @@ public class PermissionsCommand implements Commandable {
      * @param rank The rank to recalculate permissions for
      */
     private void recalculatePermissionsFor(Rank rank) {
-        _playerManager.getOnlinePlayers().stream()
+        playerManager.getOnlinePlayers().stream()
                 .filter(player -> player.getRank() == rank)
                 .forEach(player -> player.setRank(player.getRank()));
     }

@@ -16,30 +16,30 @@ public class TownManager {
      * The injected storage folder
      */
     @Inject @Named("towns")
-    private StorageFolder _storage;
+    private StorageFolder storage;
 
     /**
      * A hashmap of all the current {@link Town}s, used to save on lookup times
      */
-    private final Map<String, Town> _towns = new HashMap<>();
+    private final Map<String, Town> towns = new HashMap<>();
 
     /**
      * Saves all the currently stored towns
      */
     public void saveTowns() {
-        _towns.values().forEach(Town::save);
+        towns.values().forEach(Town::save);
     }
 
     /**
      * Loads all the stored towns from the towns folder
      */
     public void loadTowns() {
-        _towns.clear();
-        Arrays.stream(_storage.getAllFiles())
+        towns.clear();
+        Arrays.stream(storage.getAllFiles())
                 .map(File::getName)
                 .map(this::createTown)
                 .forEach(this::addTown);
-        _towns.values().forEach(Town::load);
+        towns.values().forEach(Town::load);
     }
 
     /**
@@ -49,7 +49,7 @@ public class TownManager {
      * @return A newly created town
      */
     public Town createTown(String name) {
-        return new Town(name.toLowerCase(), _storage);
+        return new Town(name.toLowerCase(), storage);
     }
 
     /**
@@ -58,7 +58,7 @@ public class TownManager {
      * @param town The {@link Town} to add
      */
     public void addTown(Town town) {
-        _towns.put(town.getName(), town);
+        towns.put(town.getName(), town);
     }
 
     /**
@@ -78,10 +78,10 @@ public class TownManager {
      * @return A {@link Town} or null if there is no town by that name
      */
     public Town getTown(String name) {
-        return _towns.get(name);
+        return towns.get(name);
     }
 
     public Collection<Town> getTowns() {
-        return _towns.values();
+        return towns.values();
     }
 }

@@ -18,49 +18,49 @@ public class Town {
     /**
      * An instance of the folder containing all towns
      */
-    private final StorageFolder _storage;
+    private final StorageFolder storage;
 
     /**
      * The spawn location for the town
      */
     @Data
-    private Location _spawnLocation;
+    private Location spawnLocation;
 
     /**
      * The region specifying the perimeter of the town
      */
     @Data
-    private Region _region;
+    private Region region;
 
     /**
      * The current balance of the town
      */
     @Data
-    private double _money;
+    private double money;
 
     /**
      * The warps the town has
      */
     @Data
-    private Map<String, Location> _warps = new HashMap<>();
+    private Map<String, Location> warps = new HashMap<>();
 
     /**
      * The map of player to rank
      */
     @Data
-    private Map<UUID, String> _playerRanks = new HashMap<>();
+    private Map<UUID, String> playerRanks = new HashMap<>();
 
     /**
      * The name of the town
      */
     @Data
-    private String _name;
+    private String name;
 
     /**
      * The ranks that the town has
      */
     @Data
-    private Set<TownRank> _ranks = new HashSet<>();
+    private Set<TownRank> ranks = new HashSet<>();
 
     /**
      * Creates a new town with the specified name and folder it's located in
@@ -69,44 +69,44 @@ public class Town {
      * @param storage The folder the town is stored in
      */
     Town(String name, StorageFolder storage) {
-        _name = name;
-        _storage = storage;
+        this.name = name;
+        this.storage = storage;
     }
 
     public Location getSpawnLocation() {
-        return _spawnLocation;
+        return spawnLocation;
     }
 
     public void setSpawnLocation(Location spawnLocation) {
-        _spawnLocation = spawnLocation;
+        this.spawnLocation = spawnLocation;
     }
 
     public Region getRegion() {
-        return _region;
+        return region;
     }
 
     public void setRegion(Region region) {
-        _region = region;
+        this.region = region;
     }
 
     public double getMoney() {
-        return _money;
+        return money;
     }
 
     public void setMoney(double money) {
-        _money = money;
+        this.money = money;
     }
 
     public Map<String, Location> getWarps() {
-        return _warps;
+        return warps;
     }
 
     public String getName() {
-        return _name;
+        return name;
     }
 
     public void setName(String townName) {
-        _name = townName;
+        name = townName;
     }
 
     /**
@@ -117,30 +117,30 @@ public class Town {
      * @throws RuntimeException If there was some weird error
      */
     public TownRank getTownRankFor(TownyPlayer player) {
-        return getRank(_playerRanks.get(player.getUuid())).orElseThrow(() -> new RuntimeException("Unable to find player's rank."));
+        return getRank(playerRanks.get(player.getUuid())).orElseThrow(() -> new RuntimeException("Unable to find player's rank."));
     }
 
     /**
      * Saves the town to the file
      */
     public void save() {
-        _storage.packup(_name, this);
+        storage.packup(name, this);
     }
 
     /**
      * Loads the town from the file and sets the fields
      */
     public void load() {
-        _storage.unbox(_name, this);
+        storage.unbox(name, this);
     }
 
     /**
      * Generates the generic set of ranks all towns have
      */
     public void generateDefaultRanks(TownyPlayer townOwner) {
-        _ranks.add(new OwnerRank("owner", "Mayor"));
-        _ranks.add(new DefaultRank("member", "Member", Collections.emptyList()));
-        _playerRanks.put(townOwner.getUuid(), "owner");
+        ranks.add(new OwnerRank("owner", "Mayor"));
+        ranks.add(new DefaultRank("member", "Member", Collections.emptyList()));
+        playerRanks.put(townOwner.getUuid(), "owner");
     }
 
     /**
@@ -150,7 +150,7 @@ public class Town {
      * @return An {@link Optional<TownRank>} empty if no rank found
      */
     public Optional<TownRank> getRank(String name) {
-        return _ranks.stream()
+        return ranks.stream()
                 .filter(r -> r.getInternalName().equals(name))
                 .findFirst();
     }
@@ -162,22 +162,22 @@ public class Town {
 
         Town town = (Town) o;
 
-        return _name.equalsIgnoreCase(town._name);
+        return name.equalsIgnoreCase(town.name);
     }
 
     @Override
     public int hashCode() {
-        return _name.toLowerCase().hashCode();
+        return name.toLowerCase().hashCode();
     }
 
     @Override
     public String toString() {
         final StringBuilder sb = new StringBuilder("Town{");
-        sb.append("_spawnLocation=").append(_spawnLocation);
-        sb.append(", _region=").append(_region);
-        sb.append(", _money=").append(_money);
-        sb.append(", _warps=").append(_warps);
-        sb.append(", _townName='").append(_name).append('\'');
+        sb.append("spawnLocation=").append(spawnLocation);
+        sb.append(", region=").append(region);
+        sb.append(", money=").append(money);
+        sb.append(", warps=").append(warps);
+        sb.append(", townName='").append(name).append('\'');
         sb.append('}');
         return sb.toString();
     }
