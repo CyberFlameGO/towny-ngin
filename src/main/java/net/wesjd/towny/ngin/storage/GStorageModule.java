@@ -7,6 +7,9 @@ import com.google.inject.name.Named;
 import net.wesjd.towny.ngin.Towny;
 import net.wesjd.towny.ngin.storage.pack.PackerStore;
 
+/**
+ * Guice module for storage related things
+ */
 public class GStorageModule extends AbstractModule {
 
     @Override

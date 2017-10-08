@@ -1,6 +1,7 @@
 package net.wesjd.towny.ngin.player;
 
 import com.google.common.io.Files;
+import net.wesjd.towny.ngin.Towny;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.permissions.Permission;
@@ -40,7 +41,7 @@ public enum Rank {
         this.color = color;
 
         try {
-            File permissionsFolder = new File(Bukkit.getPluginManager().getPlugin("ngin").getDataFolder(), "permissions");
+            File permissionsFolder = new File(Towny.getPlugin().getDataFolder(), "permissions");
             if(!permissionsFolder.exists()) permissionsFolder.mkdir();
 
             final File permissionsFile = new File(permissionsFolder, toString().toLowerCase());
