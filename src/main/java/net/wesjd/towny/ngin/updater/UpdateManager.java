@@ -64,7 +64,7 @@ public class UpdateManager {
                 } else destinationFolder = PLUGINS_FOLDER;
 
 
-                FileUtils.copyFile(file, destinationFolder);
+                FileUtils.copyFileToDirectory(file, destinationFolder);
             }
 
             if(reboot) {
