@@ -1,5 +1,6 @@
 package net.wesjd.towny.ngin.updater;
 
+import com.avaje.ebean.Update;
 import net.wesjd.towny.ngin.util.Everyone;
 import net.wesjd.towny.ngin.util.Scheduling;
 import org.apache.commons.codec.digest.DigestUtils;
@@ -27,6 +28,13 @@ public class UpdateManager {
      * Files to be watched for updates
      */
     private final List<File> files = new ArrayList<>();
+
+    /**
+     * Creates the update folder if it doesn't already exist
+     */
+    public UpdateManager() {
+        if(!UPDATE_FOLDER.exists()) UPDATE_FOLDER.mkdirs();
+    }
 
     /**
      * Add a jar to be watched for updates
