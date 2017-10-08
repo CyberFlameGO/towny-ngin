@@ -13,6 +13,7 @@ import net.wesjd.towny.ngin.listeners.JoinLeaveListener;
 import net.wesjd.towny.ngin.player.PlayerManager;
 import net.wesjd.towny.ngin.player.Rank;
 import net.wesjd.towny.ngin.storage.GStorageModule;
+import net.wesjd.towny.ngin.town.TownManager;
 import net.wesjd.towny.ngin.util.economy.EconomyInjection;
 import org.bukkit.Bukkit;
 import org.bukkit.event.Listener;
@@ -25,7 +26,7 @@ import java.util.Arrays;
 
 public class Towny extends JavaPlugin {
 
-    private final Injector _injector = Guice.createInjector(
+    private final Injector injector = Guice.createInjector(
             new GStorageModule(),
             new AbstractModule() {
                 @Override
@@ -45,14 +46,16 @@ public class Towny extends JavaPlugin {
             new File(getDataFolder(), "permissions").mkdirs();
             registerListeners(JoinLeaveListener.class);
 
-            final CommandManager commandManager = _injector.getInstance(CommandManager.class);
+            final CommandManager commandManager = injector.getInstance(CommandManager.class);
             commandManager.addVerifier(Object.class, new RequiredVerifier());
             commandManager.addVerifier(String.class, new RegexVerifier());
             commandManager.bind(Rank.class).toProvider(new EnumProvider<>());
 
             final Plugin vault = getServer().getPluginManager().getPlugin("Vault");
-            getServer().getServicesManager().register(Economy.class, _injector.getInstance(EconomyInjection.class), vault, ServicePriority.Normal);
+            getServer().getServicesManager().register(Economy.class, injector.getInstance(EconomyInjection.class), vault, ServicePriority.Normal);
             getLogger().info("Injected custom economy for vault.");
+
+            injector.getInstance(TownManager.class).loadTowns();
         } catch (Exception ex) {
             ex.printStackTrace();
             Bukkit.shutdown();
@@ -61,17 +64,18 @@ public class Towny extends JavaPlugin {
 
     @Override
     public void onDisable() {
-
+        injector.getInstance(TownManager.class).saveTowns();
+        injector.getInstance(PlayerManager.class).saveLoaded();
     }
 
     @SafeVarargs
     private final void registerListeners(Class<? extends Listener>... listeners) {
         Arrays.stream(listeners)
-                .forEach(listener -> getServer().getPluginManager().registerEvents(_injector.getInstance(listener), this));
+                .forEach(listener -> getServer().getPluginManager().registerEvents(injector.getInstance(listener), this));
     }
 
     public Injector getInjector() {
-        return _injector;
+        return injector;
     }
 
 }

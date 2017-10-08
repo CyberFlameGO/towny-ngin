@@ -8,16 +8,16 @@ import org.msgpack.core.MessagePacker;
 import org.msgpack.core.MessageUnpacker;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
-public class ListPacker extends Packer<List> {
+public class SetPacker extends Packer<Set> {
 
     @Inject
     private PackerStore packerStore;
 
     @Override
-    public void packup(List packing, MessagePacker packer) throws IOException {
+    public void packup(Set packing, MessagePacker packer) throws IOException {
         packer.packArrayHeader(packing.size());
         boolean writtenListType = false;
         Packer elementPacker = null;
@@ -29,7 +29,7 @@ public class ListPacker extends Packer<List> {
                 while (cl.isAnnotationPresent(InheritSuperPacker.class)) cl = cl.getSuperclass();
 
                 elementPacker = packerStore.lookup(cl).orElseThrow(
-                        () -> new RuntimeException("Unable to find packer for type " + p.getClass() + " in List"));
+                        () -> new RuntimeException("Unable to find packer for type " + p.getClass() + " in Set"));
 
                 packer.packString(cl.getName());
             }
@@ -39,14 +39,15 @@ public class ListPacker extends Packer<List> {
     }
 
     @Override
-    public List unbox(MessageUnpacker unpacker) throws IOException {
+    public Set unbox(MessageUnpacker unpacker) throws IOException {
         int reading = unpacker.unpackArrayHeader();
-        List<Object> unpacking = new ArrayList<>();
+        Set<Object> unpacking = new HashSet<>();
         Packer elementUnpacker = null;
         for (int i = 0; i < reading; i++) {
             if (elementUnpacker == null) {
                 String read = unpacker.unpackString();
                 try {
+
                     elementUnpacker = packerStore.lookup(Class.forName(read)).orElseThrow(() -> new RuntimeException("Unable to find packer for type " + read));
                 } catch (ClassNotFoundException e) {
                     throw new RuntimeException("Unable to find class " + read);

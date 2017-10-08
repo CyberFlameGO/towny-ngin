@@ -18,19 +18,19 @@ public class PackerStore {
      * The internal map of Class to {@link Packer}
      * Used for faster lookup times
      */
-    private Map<Class, Packer> _packerMap;
+    private Map<Class, Packer> packerMap;
 
     @Inject
-    private Towny _main;
+    private Towny main;
 
     private void lazyInstantiate() {
-        if(_packerMap == null) {
-            _packerMap = new HashMap<>();
+        if(packerMap == null) {
+            packerMap = new HashMap<>();
 
             Reflections r = new Reflections("net.wesjd.towny.ngin.storage.pack.impl");
             for (Class<? extends Packer> cl : r.getSubTypesOf(Packer.class)) {
-                Packer p = _main.getInjector().getInstance(cl);
-                _packerMap.put(p.getPacking(), p);
+                Packer p = main.getInjector().getInstance(cl);
+                packerMap.put(p.getPacking(), p);
             }
         }
     }
@@ -44,6 +44,6 @@ public class PackerStore {
     public Optional<Packer> lookup(Class type) {
         lazyInstantiate();
         if(type.isPrimitive()) type = Primitives.wrap(type);
-        return Optional.ofNullable(_packerMap.get(type));
+        return Optional.ofNullable(packerMap.get(type));
     }
 }

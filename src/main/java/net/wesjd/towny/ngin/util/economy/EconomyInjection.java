@@ -19,7 +19,7 @@ public class EconomyInjection extends AbstractEconomy {
      * The injected player manager
      */
     @Inject
-    private PlayerManager _playerManager;
+    private PlayerManager playerManager;
 
     @Override
     public boolean isEnabled() {
@@ -60,11 +60,11 @@ public class EconomyInjection extends AbstractEconomy {
     public EconomyResponse depositPlayer(String playerName, double amount) {
         if(amount < 0) return new EconomyResponse(0, 0, EconomyResponse.ResponseType.FAILURE, "Can't deposit negative");
 
-        final UUID playerUuid = _playerManager.getUUIDFor(playerName);
-        OfflineTownyPlayer player = _playerManager.getPlayer(playerUuid);
+        final UUID playerUuid = playerManager.getUUIDFor(playerName);
+        OfflineTownyPlayer player = playerManager.getPlayer(playerUuid);
         boolean createdOffline = false;
         if(player == null) {
-            player = _playerManager.createOfflineTownyPlayer(playerUuid);
+            player = playerManager.createOfflineTownyPlayer(playerUuid);
             createdOffline = true;
         }
         player.addMoney(amount);
