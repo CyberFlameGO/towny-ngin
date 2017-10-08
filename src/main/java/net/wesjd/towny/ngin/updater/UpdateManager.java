@@ -53,6 +53,8 @@ public class UpdateManager {
             boolean reboot = false;
 
             for(File file : files) {
+                if(!file.exists()) continue; //when it matches up with maven compile, it errors
+
                 final File localJar = new File(PLUGINS_FOLDER, file.getName());
 
                 File destinationFolder;
