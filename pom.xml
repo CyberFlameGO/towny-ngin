@@ -24,6 +24,7 @@
     </repositories>
 
     <dependencies>
+        <!-- Scope provided -->
         <dependency>
             <groupId>org.spigotmc</groupId>
             <artifactId>spigot-api</artifactId>
@@ -42,7 +43,14 @@
             <version>1.6</version>
             <scope>provided</scope>
         </dependency>
+        <dependency>
+            <groupId>commons-codec</groupId>
+            <artifactId>commons-codec</artifactId>
+            <version>1.10</version>
+            <scope>provided</scope>
+        </dependency>
 
+        <!-- Scope compile -->
         <dependency>
             <groupId>com.google.inject</groupId>
             <artifactId>guice</artifactId>

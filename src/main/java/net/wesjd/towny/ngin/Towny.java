@@ -4,6 +4,7 @@ import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.Singleton;
+import com.google.inject.name.Names;
 import net.milkbowl.vault.economy.Economy;
 import net.wesjd.towny.ngin.command.framework.CommandManager;
 import net.wesjd.towny.ngin.command.framework.argument.provider.EnumProvider;
@@ -14,6 +15,8 @@ import net.wesjd.towny.ngin.player.PlayerManager;
 import net.wesjd.towny.ngin.player.Rank;
 import net.wesjd.towny.ngin.storage.GStorageModule;
 import net.wesjd.towny.ngin.town.TownManager;
+import net.wesjd.towny.ngin.updater.UpdateManager;
+import net.wesjd.towny.ngin.util.Scheduling;
 import net.wesjd.towny.ngin.util.economy.EconomyInjection;
 import org.bukkit.Bukkit;
 import org.bukkit.event.Listener;
@@ -35,6 +38,7 @@ public class Towny extends JavaPlugin {
 
                     bind(PlayerManager.class).in(Singleton.class);
                     bind(CommandManager.class).in(Singleton.class);
+                    bind(UpdateManager.class).in(Singleton.class);
                 }
             }
     );
@@ -43,8 +47,12 @@ public class Towny extends JavaPlugin {
     public void onEnable() {
         try {
             getDataFolder().mkdirs();
-            new File(getDataFolder(), "permissions").mkdirs();
+
             registerListeners(JoinLeaveListener.class);
+
+            final UpdateManager updateManager = injector.getInstance(UpdateManager.class);
+            updateManager.addJar("/home/customer/towny-ngin/target/ngin-LATEST.jar");
+            Scheduling.syncTimer(updateManager::checkForUpdates, 0, 20 * 15);
 
             final CommandManager commandManager = injector.getInstance(CommandManager.class);
             commandManager.addVerifier(Object.class, new RequiredVerifier());
@@ -76,6 +84,10 @@ public class Towny extends JavaPlugin {
 
     public Injector getInjector() {
         return injector;
+    }
+
+    public static Towny getPlugin() {
+        return getPlugin(Towny.class);
     }
 
 }
