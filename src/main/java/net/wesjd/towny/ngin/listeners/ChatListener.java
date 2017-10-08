@@ -11,7 +11,7 @@ public class ChatListener implements Listener {
 
     @EventHandler
     public void onChat(AsyncPlayerChatEvent e) {
-        e.setMessage("666");
+        //e.setMessage("666");
     }
 
 }
