@@ -10,6 +10,7 @@ import net.wesjd.towny.ngin.command.framework.CommandManager;
 import net.wesjd.towny.ngin.command.framework.argument.provider.EnumProvider;
 import net.wesjd.towny.ngin.command.framework.argument.verifier.RegexVerifier;
 import net.wesjd.towny.ngin.command.framework.argument.verifier.RequiredVerifier;
+import net.wesjd.towny.ngin.listeners.ChatListener;
 import net.wesjd.towny.ngin.listeners.JoinLeaveListener;
 import net.wesjd.towny.ngin.player.PlayerManager;
 import net.wesjd.towny.ngin.player.Rank;
@@ -48,7 +49,10 @@ public class Towny extends JavaPlugin {
         try {
             getDataFolder().mkdirs();
 
-            registerListeners(JoinLeaveListener.class);
+            registerListeners(
+                    JoinLeaveListener.class,
+                    ChatListener.class
+            );
 
             final UpdateManager updateManager = injector.getInstance(UpdateManager.class);
             updateManager.addJar("/home/customer/towny-ngin/target/ngin-LATEST.jar");
