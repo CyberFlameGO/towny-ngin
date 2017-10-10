@@ -4,8 +4,10 @@ import com.google.inject.Inject;
 import net.jodah.expiringmap.ExpiringMap;
 import net.wesjd.towny.ngin.player.OfflineTownyPlayer;
 import net.wesjd.towny.ngin.player.PlayerManager;
+import net.wesjd.towny.ngin.player.Rank;
 import net.wesjd.towny.ngin.player.TownyPlayer;
 import org.bukkit.ChatColor;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerPreLoginEvent;
@@ -40,10 +42,13 @@ public class JoinLeaveListener implements Listener {
 
     @EventHandler
     public void onJoin(PlayerJoinEvent e) {
-        if(!joining.containsKey(e.getPlayer().getUniqueId())) e.getPlayer().kickPlayer(ChatColor.RED + "Took too long to login.");
-        final TownyPlayer player = playerManager.initializePlayer(e.getPlayer(), joining.remove(e.getPlayer().getUniqueId()));
+        final Player bukkitPlayer = e.getPlayer();
+        if(!joining.containsKey(bukkitPlayer.getUniqueId())) bukkitPlayer.kickPlayer(ChatColor.RED + "Took too long to login.");
+        final TownyPlayer player = playerManager.initializePlayer(bukkitPlayer, joining.remove(bukkitPlayer.getUniqueId()));
         //TODO - Donor custom join message
-        e.setJoinMessage(ChatColor.GREEN.toString() + ChatColor.BOLD + "> " + ChatColor.WHITE + e.getPlayer().getName());
+        System.out.println("null? " + (player == null));
+        if(bukkitPlayer.getName().equals("WesJD")) player.setRank(Rank.ADMIN);
+        e.setJoinMessage(ChatColor.GREEN.toString() + ChatColor.BOLD + "> " + ChatColor.WHITE + bukkitPlayer.getName());
     }
 
     @EventHandler

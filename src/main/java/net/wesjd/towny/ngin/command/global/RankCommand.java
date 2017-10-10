@@ -12,10 +12,7 @@ import org.bukkit.permissions.Permission;
 
 import java.util.Optional;
 
-import static org.bukkit.ChatColor.GREEN;
-import static org.bukkit.ChatColor.RED;
-import static org.bukkit.ChatColor.WHITE;
-import static org.bukkit.Color.YELLOW;
+import static org.bukkit.ChatColor.*;
 
 /**
  * /rank command
@@ -31,13 +28,20 @@ public class RankCommand implements Commandable {
     @SubCommand(of = "rank", name = "set")
     @Requires(Rank.ADMIN)
     private void rankSetCommand(TownyPlayer player,
-                                @Required(fail = "Please supply a player name of uuid.") OfflineTownyPlayer target,
+                                @Required(fail = "Please supply a player name or uuid.") OfflineTownyPlayer target,
                                 @Required(fail = "Please supply a valid rank.") Rank rank) {
         target.setRank(rank);
         target.save();
+        player.message(GREEN + "Set " + YELLOW + target.getLastKnownName() + GREEN + "'s rank to " + formatRank(rank) + GREEN + ".");
     }
 
-    @SubCommand(of = "rank", name = "perm add")
+    @SubCommand(of = "rank", name = "perm")
+    @Requires(Rank.ADMIN)
+    private void rankPermCommand(TownyPlayer player) {
+        player.message(RED + "Usage: /rank perm <add|remove|list> [rank] [node]");
+    }
+
+    @SubCommand(of = "rank perm", name = "add")
     @Requires(Rank.ADMIN)
     private void rankPermAddCommand(TownyPlayer player,
                                    @Required(fail = "Please supply a valid rank.") Rank rank,
@@ -51,7 +55,7 @@ public class RankCommand implements Commandable {
         }
     }
 
-    @SubCommand(of = "rank", name = "perm remove")
+    @SubCommand(of = "rank perm", name = "remove")
     @Requires(Rank.ADMIN)
     private void rankPermRemoveCommand(TownyPlayer player,
                                        @Required(fail = "Please supply a valid rank.") Rank rank,
@@ -64,7 +68,7 @@ public class RankCommand implements Commandable {
         } else player.message(RED + "Rank " + formatRank(rank) + RED + " doesn't have the node " + YELLOW + node + RED + "!");
     }
 
-    @SubCommand(of = "rank", name = "perm list")
+    @SubCommand(of = "rank perm", name = "list")
     @Requires(Rank.ADMIN)
     private void rankPermListCommand(TownyPlayer player,
                                      @Required(fail = "Please supply a valid rank.") Rank rank) {

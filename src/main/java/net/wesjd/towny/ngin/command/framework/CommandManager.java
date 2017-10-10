@@ -171,8 +171,8 @@ public class CommandManager {
                         final ArgumentBinding<?> binding = bindings.get(type);
                         if(binding != null) {
                             final Optional<Class<? extends Annotation>> annotation = binding.getAnnotation();
-                            if(!annotation.isPresent() || (annotation.isPresent() && parameter.isAnnotationPresent(annotation.get()))) {
-                                supply = binding.getArgumentProvider().get(parameter, arguments);
+                            if(!annotation.isPresent() || parameter.isAnnotationPresent(annotation.get())) {
+                                if(arguments.hasNext()) supply = binding.getArgumentProvider().get(parameter, arguments);
                                 supplied = true;
                             }
                         }

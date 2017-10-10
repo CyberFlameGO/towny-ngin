@@ -64,7 +64,7 @@ public class Towny extends JavaPlugin {
             commandManager.addVerifier(Object.class, new RequiredVerifier());
             commandManager.addVerifier(String.class, new RegexVerifier());
             commandManager.bind(Rank.class).toProvider(new EnumProvider<>());
-            commandManager.bind(OfflineTownyPlayer.class).toProvider(new OfflineTownyPlayerProvider());
+            commandManager.bind(OfflineTownyPlayer.class).toProvider(injector.getInstance(OfflineTownyPlayerProvider.class));
             commandManager.registerClassesOf("net.wesjd.towny.ngin.command");
 
             final Plugin vault = getServer().getPluginManager().getPlugin("Vault");
