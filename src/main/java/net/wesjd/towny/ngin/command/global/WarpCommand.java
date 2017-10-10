@@ -1,4 +1,4 @@
-package net.wesjd.towny.ngin.command;
+package net.wesjd.towny.ngin.command.global;
 
 public class WarpCommand {
 

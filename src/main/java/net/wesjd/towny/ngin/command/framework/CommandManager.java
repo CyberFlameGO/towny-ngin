@@ -61,7 +61,6 @@ public class CommandManager {
     @Inject
     public CommandManager(Towny main, PlayerManager playerManager) {
         this.main = main;
-        new Reflections("net.wesjd.towny.ngin.command").getSubTypesOf(Commandable.class).forEach(this::buildCommands);
         Bukkit.getPluginManager().registerEvents(new Listener() {
             @EventHandler
             public void onCommand(PlayerCommandPreprocessEvent e) {
@@ -73,6 +72,17 @@ public class CommandManager {
                     e.setCancelled(true);
             }
         }, main);
+    }
+
+    /**
+     * Register all {@link Commandable} classes under the provided package
+     *
+     * @param pkg The package to register
+     */
+    public void registerClassesOf(String pkg) {
+        new Reflections(pkg)
+                .getSubTypesOf(Commandable.class)
+                .forEach(this::buildCommands);
     }
 
     /**
