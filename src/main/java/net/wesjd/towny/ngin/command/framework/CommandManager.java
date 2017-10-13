@@ -133,9 +133,17 @@ public class CommandManager {
      * @return The top subcommand
      */
     private SubCommandData getTopSubcommand(String base, Arguments arguments, SubCommandData lastTop, Set<SubCommandData> subcommands) {
-        for(SubCommandData subcommand : subcommands) {
-            if(subcommand.getAnnotation().of().equals(base) && arguments.hasNext())
-                return getTopSubcommand(base + " " + arguments.next(), arguments, subcommand, subcommand.getSubcommands());
+        if(arguments.hasNext()) {
+            final String next = arguments.next();
+            for(SubCommandData subcommand : subcommands) {
+                final SubCommand annotation = subcommand.getAnnotation();
+                if(annotation.of().equals(base) && annotation.name().equals(next)) {
+                    final SubCommandData nextResult = getTopSubcommand(base + " " + next, arguments, subcommand, subcommand.getSubcommands());
+                    if(nextResult == null) return subcommand;
+                    else return nextResult;
+                }
+            }
+            arguments.unshift();
         }
         return lastTop;
     }
@@ -351,6 +359,10 @@ public class CommandManager {
             return Collections.unmodifiableSet(subcommands);
         }
 
+        @Override
+        public String toString() {
+            return subcommand.name();
+        }
     }
 
 }
