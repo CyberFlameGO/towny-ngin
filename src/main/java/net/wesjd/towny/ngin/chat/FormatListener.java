@@ -11,6 +11,7 @@ import org.bukkit.event.player.AsyncPlayerChatEvent;
 
 import javax.inject.Inject;
 
+import static org.bukkit.ChatColor.DARK_GRAY;
 import static org.bukkit.ChatColor.GRAY;
 import static org.bukkit.ChatColor.RESET;
 
@@ -29,7 +30,8 @@ public class FormatListener implements Listener {
     public void onChat(AsyncPlayerChatEvent e) {
         final TownyPlayer player = playerManager.getPlayer(e.getPlayer());
         final Rank rank = player.getRank();
-        Everyone.message(rank.getColor() + rank.getPrefix() + GRAY + ": " + RESET + e.getMessage());
+        Everyone.message(DARK_GRAY + "[" + rank.getColor() + rank.getPrefix() + DARK_GRAY + "] " +
+                rank.getColor() + player.getName() + GRAY + ": " + RESET + e.getMessage());
 
         e.setCancelled(true);
     }

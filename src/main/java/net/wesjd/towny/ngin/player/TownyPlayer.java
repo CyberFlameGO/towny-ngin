@@ -48,6 +48,15 @@ public class TownyPlayer extends OfflineTownyPlayer {
     }
 
     /**
+     * Get their display name
+     *
+     * @return Their display name
+     */
+    public String getName() {
+        return getLastKnownName();
+    }
+
+    /**
      * Send the player a message
      *
      * @param message The message to send the player
