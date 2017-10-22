@@ -24,7 +24,7 @@ public class ChatLock implements Listener {
     /**
      * True if chat is locked and no players are able to speak
      */
-    private boolean enabled;
+    private boolean enabled = false;
 
     @Inject
     private PlayerManager playerManager;
@@ -85,7 +85,10 @@ public class ChatLock implements Listener {
     @EventHandler
     public void onChat(AsyncPlayerChatEvent ev) {
         final TownyPlayer player = playerManager.getPlayer(ev.getPlayer());
-        if (enabled && !player.hasRank(Rank.MOD)) ev.setCancelled(true);
+        if (enabled && !player.hasRank(Rank.MOD)) {
+            ev.setCancelled(true);
+            player.message(RED + "Chat is currently locked!");
+        }
     }
 
 }
