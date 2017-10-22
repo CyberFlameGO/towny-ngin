@@ -1,9 +1,15 @@
 package net.wesjd.towny.ngin.player;
 
+import com.comphenix.protocol.PacketType;
+import com.comphenix.protocol.ProtocolLibrary;
+import com.comphenix.protocol.events.PacketContainer;
+import com.comphenix.protocol.wrappers.WrappedChatComponent;
 import net.wesjd.towny.ngin.storage.StorageFolder;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.permissions.PermissionAttachment;
+
+import java.lang.reflect.InvocationTargetException;
 
 /**
  * Represents an online towny player
@@ -48,6 +54,18 @@ public class TownyPlayer extends OfflineTownyPlayer {
      */
     public void message(String message) {
         wrapped.sendMessage(message);
+    }
+
+    public void sendActionBar(String message) {
+
+        PacketContainer chat = new PacketContainer(PacketType.Play.Server.CHAT);
+        chat.getChatComponents().write(0, WrappedChatComponent.fromText(message));
+        chat.getBytes().write(0, (byte) 2);
+        try {
+            ProtocolLibrary.getProtocolManager().sendServerPacket(wrapped, chat);
+        } catch (InvocationTargetException e) {
+
+        }
     }
 
     public Player getWrapped() {
