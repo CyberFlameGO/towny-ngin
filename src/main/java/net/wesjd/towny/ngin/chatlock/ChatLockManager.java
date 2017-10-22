@@ -38,6 +38,11 @@ public class ChatLockManager implements Listener {
         return this.isLocked;
     }
 
+    /**
+     * Toggles the lock and informs players of the new status
+     *
+     * @return The new state of the lock
+     */
     public boolean toggleLock() {
         this.isLocked = !this.isLocked;
         if (this.isLocked)
@@ -46,6 +51,11 @@ public class ChatLockManager implements Listener {
         return this.isLocked;
     }
 
+    /**
+     * Checks to see if any staff remain
+     *
+     * @return Whether there are staff online
+     */
     private boolean hasRemainingStaff() {
         return Bukkit.getOnlinePlayers().stream().anyMatch(p -> {
             final TownyPlayer player = playerManager.getPlayer(p); // player is null if they have just left
@@ -53,12 +63,25 @@ public class ChatLockManager implements Listener {
         });
     }
 
+
+    /**
+     * Checks to see if there are no staff and chat is locked,
+     * then unlocking to prevent chat being stuck locked
+     *
+     * @param ev The event that fired
+     */
     @EventHandler
     public void onQuit(PlayerQuitEvent ev) {
         if(isLocked && !hasRemainingStaff())
             toggleLock();
     }
 
+    /**
+     * Prevents players under the MOD rank to speak
+     * when the chat lock is enabled
+     *
+     * @param ev The event that fired
+     */
     @EventHandler
     public void onChat(AsyncPlayerChatEvent ev) {
         final TownyPlayer player = playerManager.getPlayer(ev.getPlayer());

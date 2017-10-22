@@ -56,15 +56,22 @@ public class TownyPlayer extends OfflineTownyPlayer {
         wrapped.sendMessage(message);
     }
 
+    /**
+     * Sends an action bar to the wrapped player
+     *
+     * @param message The action bar to send
+     */
     public void sendActionBar(String message) {
 
-        PacketContainer chat = new PacketContainer(PacketType.Play.Server.CHAT);
-        chat.getChatComponents().write(0, WrappedChatComponent.fromText(message));
-        chat.getBytes().write(0, (byte) 2);
         try {
+            final PacketContainer chat = new PacketContainer(PacketType.Play.Server.CHAT);
+
+            chat.getChatComponents().write(0, WrappedChatComponent.fromText(message));
+            chat.getBytes().write(0, (byte) 2);
+
             ProtocolLibrary.getProtocolManager().sendServerPacket(wrapped, chat);
         } catch (InvocationTargetException e) {
-
+            throw new RuntimeException("Failed to send action bar packet", e);
         }
     }
 

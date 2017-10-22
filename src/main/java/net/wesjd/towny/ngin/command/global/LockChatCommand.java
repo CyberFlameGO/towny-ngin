@@ -1,4 +1,4 @@
-package net.wesjd.towny.ngin.command;
+package net.wesjd.towny.ngin.command.global;
 
 import com.google.inject.Inject;
 import net.wesjd.towny.ngin.chatlock.ChatLockManager;
