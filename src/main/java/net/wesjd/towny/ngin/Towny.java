@@ -6,6 +6,7 @@ import com.google.inject.Injector;
 import com.google.inject.Singleton;
 import com.google.inject.name.Names;
 import net.milkbowl.vault.economy.Economy;
+import net.wesjd.towny.ngin.chatlock.ChatLockManager;
 import net.wesjd.towny.ngin.command.framework.CommandManager;
 import net.wesjd.towny.ngin.command.framework.argument.provider.EnumProvider;
 import net.wesjd.towny.ngin.command.framework.argument.provider.OfflineTownyPlayerProvider;
@@ -42,6 +43,7 @@ public class Towny extends JavaPlugin {
                     bind(PlayerManager.class).in(Singleton.class);
                     bind(CommandManager.class).in(Singleton.class);
                     bind(UpdateManager.class).in(Singleton.class);
+                    bind(ChatLockManager.class).in(Singleton.class);
                 }
             }
     );
