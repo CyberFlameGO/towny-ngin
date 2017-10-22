@@ -2,9 +2,7 @@ package net.wesjd.towny.ngin.player;
 
 import com.google.common.io.Files;
 import net.wesjd.towny.ngin.Towny;
-import net.wesjd.towny.ngin.util.Everyone;
-import net.wesjd.towny.ngin.util.Filer;
-import org.bukkit.Bukkit;
+import org.apache.commons.io.FileUtils;
 import org.bukkit.ChatColor;
 import org.bukkit.permissions.Permission;
 
@@ -63,7 +61,11 @@ public enum Rank {
      * Save the current permissions to the permissions file
      */
     public void savePermissions() {
-        Filer.writeLines(permissionsFile, permissions.stream().map(Permission::getName).collect(Collectors.toList()));
+        try {
+            FileUtils.writeLines(permissionsFile, permissions.stream().map(Permission::getName).collect(Collectors.toList()));
+        } catch (IOException ex) {
+            throw new RuntimeException(ex);
+        }
     }
 
     /**
