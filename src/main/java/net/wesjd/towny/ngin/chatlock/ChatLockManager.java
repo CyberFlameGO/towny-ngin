@@ -14,12 +14,10 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
-import java.util.logging.Logger;
-
 /**
  * Manages whether chat is locked or not
  */
-public class ChatLockManager implements Listener {
+public class ChatLockManager implements Listener, Runnable {
 
     /**
      * True if chat is locked and no players are able to speak
@@ -32,6 +30,7 @@ public class ChatLockManager implements Listener {
     @Inject
     public ChatLockManager(Towny towny) {
         Bukkit.getPluginManager().registerEvents(this, towny);
+        Bukkit.getScheduler().scheduleSyncRepeatingTask(towny, this, 0, 20);
     }
 
     public boolean isLocked() {
@@ -57,37 +56,34 @@ public class ChatLockManager implements Listener {
      * @return Whether there are staff online
      */
     private boolean hasRemainingStaff() {
-        return Bukkit.getOnlinePlayers().stream().anyMatch(p -> {
-            final TownyPlayer player = playerManager.getPlayer(p); // player is null if they have just left
-            return player != null && player.hasRank(Rank.MOD);
-        });
+        return playerManager.getOnlinePlayers().stream().anyMatch(p -> p.hasRank(Rank.MOD));
     }
-
 
     /**
      * Checks to see if there are no staff and chat is locked,
      * then unlocking to prevent chat being stuck locked
-     *
-     * @param ev The event that fired
      */
     @EventHandler
     public void onQuit(PlayerQuitEvent ev) {
-        if(isLocked && !hasRemainingStaff())
+        if (isLocked && !hasRemainingStaff())
             toggleLock();
     }
 
     /**
      * Prevents players under the MOD rank to speak
      * when the chat lock is enabled
-     *
-     * @param ev The event that fired
      */
     @EventHandler
     public void onChat(AsyncPlayerChatEvent ev) {
         final TownyPlayer player = playerManager.getPlayer(ev.getPlayer());
-        if (!player.hasRank(Rank.MOD) && isLocked) {
-            ev.setCancelled(true);
-            player.sendActionBar(ChatColor.RED + "Chat is currently locked!");
-        }
+        if (!player.hasRank(Rank.MOD) && isLocked) ev.setCancelled(true);
+    }
+
+    /**
+     * Handle showing chat lock when it is enabled
+     */
+    @Override
+    public void run() {
+        if(isLocked) Everyone.sendActionBar(ChatColor.RED + "Chat is currently locked!");
     }
 }
