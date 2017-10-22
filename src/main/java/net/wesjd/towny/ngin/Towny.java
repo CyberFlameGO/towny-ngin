@@ -4,15 +4,14 @@ import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.Singleton;
-import com.google.inject.name.Names;
 import net.milkbowl.vault.economy.Economy;
-import net.wesjd.towny.ngin.chatlock.ChatLockManager;
+import net.wesjd.towny.ngin.chat.ChatLock;
 import net.wesjd.towny.ngin.command.framework.CommandManager;
 import net.wesjd.towny.ngin.command.framework.argument.provider.EnumProvider;
 import net.wesjd.towny.ngin.command.framework.argument.provider.OfflineTownyPlayerProvider;
 import net.wesjd.towny.ngin.command.framework.argument.verifier.RegexVerifier;
 import net.wesjd.towny.ngin.command.framework.argument.verifier.RequiredVerifier;
-import net.wesjd.towny.ngin.listeners.ChatListener;
+import net.wesjd.towny.ngin.chat.FormatListener;
 import net.wesjd.towny.ngin.listeners.JoinLeaveListener;
 import net.wesjd.towny.ngin.player.OfflineTownyPlayer;
 import net.wesjd.towny.ngin.player.PlayerManager;
@@ -28,7 +27,6 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.ServicePriority;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import java.io.File;
 import java.util.Arrays;
 
 public class Towny extends JavaPlugin {
@@ -43,7 +41,7 @@ public class Towny extends JavaPlugin {
                     bind(PlayerManager.class).in(Singleton.class);
                     bind(CommandManager.class).in(Singleton.class);
                     bind(UpdateManager.class).in(Singleton.class);
-                    bind(ChatLockManager.class).in(Singleton.class);
+                    bind(ChatLock.class).in(Singleton.class);
                 }
             }
     );
@@ -55,7 +53,7 @@ public class Towny extends JavaPlugin {
 
             registerListeners(
                     JoinLeaveListener.class,
-                    ChatListener.class
+                    FormatListener.class
             );
 
             final UpdateManager updateManager = injector.getInstance(UpdateManager.class);

@@ -26,9 +26,7 @@ public class Everyone {
      * @param message The action bar message
      */
     public static void sendActionBar(String message) {
-        each(player -> {
-            player.sendActionBar(message); // player is null when called from PlayerQuitEvent & iterating through players
-        });
+        each(player -> player.sendActionBar(message));
     }
 
     /**

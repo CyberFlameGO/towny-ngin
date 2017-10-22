@@ -1,40 +1,49 @@
-package net.wesjd.towny.ngin.chatlock;
+package net.wesjd.towny.ngin.chat;
 
 import com.google.inject.Inject;
 import net.wesjd.towny.ngin.Towny;
 import net.wesjd.towny.ngin.player.PlayerManager;
 import net.wesjd.towny.ngin.player.Rank;
 import net.wesjd.towny.ngin.player.TownyPlayer;
-import net.wesjd.towny.ngin.town.TownManager;
 import net.wesjd.towny.ngin.util.Everyone;
+import net.wesjd.towny.ngin.util.Scheduling;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
+import static org.bukkit.ChatColor.GREEN;
+import static org.bukkit.ChatColor.RED;
+
 /**
  * Manages whether chat is locked or not
  */
-public class ChatLockManager implements Listener, Runnable {
+public class ChatLock implements Listener {
 
     /**
      * True if chat is locked and no players are able to speak
      */
-    private boolean isLocked;
+    private boolean enabled;
 
     @Inject
     private PlayerManager playerManager;
 
     @Inject
-    public ChatLockManager(Towny towny) {
+    public ChatLock(Towny towny) {
         Bukkit.getPluginManager().registerEvents(this, towny);
-        Bukkit.getScheduler().scheduleSyncRepeatingTask(towny, this, 0, 20);
+        Scheduling.syncTimer(() -> {
+            if(enabled) Everyone.sendActionBar(RED + "Chat is currently locked!");
+        }, 0, 20);
     }
 
-    public boolean isLocked() {
-        return this.isLocked;
+    /**
+     * Check if it's enabled
+     *
+     * @return The state
+     */
+    public boolean isEnabled() {
+        return enabled;
     }
 
     /**
@@ -42,12 +51,13 @@ public class ChatLockManager implements Listener, Runnable {
      *
      * @return The new state of the lock
      */
-    public boolean toggleLock() {
-        this.isLocked = !this.isLocked;
-        if (this.isLocked)
-            Everyone.sendActionBar(ChatColor.RED + "Chat has been locked.");
-        else Everyone.sendActionBar(ChatColor.GREEN + "Chat has been unlocked.");
-        return this.isLocked;
+    public boolean toggle() {
+        enabled = !enabled;
+
+        if (enabled) Everyone.sendActionBar(RED + "Chat has been locked.");
+        else Everyone.sendActionBar(GREEN + "Chat has been unlocked.");
+
+        return enabled;
     }
 
     /**
@@ -65,8 +75,7 @@ public class ChatLockManager implements Listener, Runnable {
      */
     @EventHandler
     public void onQuit(PlayerQuitEvent ev) {
-        if (isLocked && !hasRemainingStaff())
-            toggleLock();
+        if (enabled && !hasRemainingStaff()) toggle();
     }
 
     /**
@@ -76,14 +85,7 @@ public class ChatLockManager implements Listener, Runnable {
     @EventHandler
     public void onChat(AsyncPlayerChatEvent ev) {
         final TownyPlayer player = playerManager.getPlayer(ev.getPlayer());
-        if (!player.hasRank(Rank.MOD) && isLocked) ev.setCancelled(true);
+        if (enabled && !player.hasRank(Rank.MOD)) ev.setCancelled(true);
     }
 
-    /**
-     * Handle showing chat lock when it is enabled
-     */
-    @Override
-    public void run() {
-        if(isLocked) Everyone.sendActionBar(ChatColor.RED + "Chat is currently locked!");
-    }
 }
