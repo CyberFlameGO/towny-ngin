@@ -9,10 +9,12 @@ import net.milkbowl.vault.economy.Economy;
 import net.wesjd.towny.ngin.chatlock.ChatLockManager;
 import net.wesjd.towny.ngin.command.framework.CommandManager;
 import net.wesjd.towny.ngin.command.framework.argument.provider.EnumProvider;
+import net.wesjd.towny.ngin.command.framework.argument.provider.OfflineTownyPlayerProvider;
 import net.wesjd.towny.ngin.command.framework.argument.verifier.RegexVerifier;
 import net.wesjd.towny.ngin.command.framework.argument.verifier.RequiredVerifier;
 import net.wesjd.towny.ngin.listeners.ChatListener;
 import net.wesjd.towny.ngin.listeners.JoinLeaveListener;
+import net.wesjd.towny.ngin.player.OfflineTownyPlayer;
 import net.wesjd.towny.ngin.player.PlayerManager;
 import net.wesjd.towny.ngin.player.Rank;
 import net.wesjd.towny.ngin.storage.GStorageModule;
@@ -64,6 +66,8 @@ public class Towny extends JavaPlugin {
             commandManager.addVerifier(Object.class, new RequiredVerifier());
             commandManager.addVerifier(String.class, new RegexVerifier());
             commandManager.bind(Rank.class).toProvider(new EnumProvider<>());
+            commandManager.bind(OfflineTownyPlayer.class).toProvider(injector.getInstance(OfflineTownyPlayerProvider.class));
+            commandManager.registerClassesOf("net.wesjd.towny.ngin.command");
 
             final Plugin vault = getServer().getPluginManager().getPlugin("Vault");
             getServer().getServicesManager().register(Economy.class, injector.getInstance(EconomyInjection.class), vault, ServicePriority.Normal);

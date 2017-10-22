@@ -34,8 +34,20 @@ public class Arguments {
         return arguments[position++];
     }
 
+    /**
+     * Get the next argument in the array, safely
+     *
+     * @return The next argument as an optional
+     */
     public Optional<String> safeNext() {
         return position == arguments.length ? Optional.empty() : Optional.of(next());
+    }
+
+    /**
+     * Shifts back an index
+     */
+    public void unshift() {
+        position--;
     }
 
     /**

@@ -1,4 +1,4 @@
-package net.wesjd.towny.ngin.command;
+package net.wesjd.towny.ngin.command.town;
 
 import com.google.inject.Inject;
 import mkremins.fanciful.FancyMessage;

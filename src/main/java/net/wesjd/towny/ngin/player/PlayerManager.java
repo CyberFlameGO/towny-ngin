@@ -80,7 +80,10 @@ public class PlayerManager {
      */
     public TownyPlayer initializePlayer(Player player, OfflineTownyPlayer offline) {
         Validate.isTrue(!store.containsKey(offline.getUuid()));
-        return store.put(offline.getUuid(), new TownyPlayer(player, storage, offline));
+
+        final TownyPlayer townyPlayer = new TownyPlayer(player, storage, offline);
+        store.put(offline.getUuid(), townyPlayer);
+        return townyPlayer;
     }
 
     /**

@@ -61,7 +61,6 @@ public class CommandManager {
     @Inject
     public CommandManager(Towny main, PlayerManager playerManager) {
         this.main = main;
-        new Reflections("net.wesjd.towny.ngin.command").getSubTypesOf(Commandable.class).forEach(this::buildCommands);
         Bukkit.getPluginManager().registerEvents(new Listener() {
             @EventHandler
             public void onCommand(PlayerCommandPreprocessEvent e) {
@@ -73,6 +72,17 @@ public class CommandManager {
                     e.setCancelled(true);
             }
         }, main);
+    }
+
+    /**
+     * Register all {@link Commandable} classes under the provided package
+     *
+     * @param pkg The package to register
+     */
+    public void registerClassesOf(String pkg) {
+        new Reflections(pkg)
+                .getSubTypesOf(Commandable.class)
+                .forEach(this::buildCommands);
     }
 
     /**
@@ -123,9 +133,17 @@ public class CommandManager {
      * @return The top subcommand
      */
     private SubCommandData getTopSubcommand(String base, Arguments arguments, SubCommandData lastTop, Set<SubCommandData> subcommands) {
-        for(SubCommandData subcommand : subcommands) {
-            if(subcommand.getAnnotation().of().equals(base) && arguments.hasNext())
-                return getTopSubcommand(base + " " + arguments.next(), arguments, subcommand, subcommand.getSubcommands());
+        if(arguments.hasNext()) {
+            final String next = arguments.next();
+            for(SubCommandData subcommand : subcommands) {
+                final SubCommand annotation = subcommand.getAnnotation();
+                if(annotation.of().equals(base) && annotation.name().equals(next)) {
+                    final SubCommandData nextResult = getTopSubcommand(base + " " + next, arguments, subcommand, subcommand.getSubcommands());
+                    if(nextResult == null) return subcommand;
+                    else return nextResult;
+                }
+            }
+            arguments.unshift();
         }
         return lastTop;
     }
@@ -161,8 +179,8 @@ public class CommandManager {
                         final ArgumentBinding<?> binding = bindings.get(type);
                         if(binding != null) {
                             final Optional<Class<? extends Annotation>> annotation = binding.getAnnotation();
-                            if(!annotation.isPresent() || (annotation.isPresent() && parameter.isAnnotationPresent(annotation.get()))) {
-                                supply = binding.getArgumentProvider().get(parameter, arguments);
+                            if(!annotation.isPresent() || parameter.isAnnotationPresent(annotation.get())) {
+                                if(arguments.hasNext()) supply = binding.getArgumentProvider().get(parameter, arguments);
                                 supplied = true;
                             }
                         }
@@ -341,6 +359,10 @@ public class CommandManager {
             return Collections.unmodifiableSet(subcommands);
         }
 
+        @Override
+        public String toString() {
+            return subcommand.name();
+        }
     }
 
 }
