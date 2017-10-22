@@ -43,13 +43,9 @@ public class JoinLeaveListener implements Listener {
     @EventHandler
     public void onJoin(PlayerJoinEvent e) {
         final Player bukkitPlayer = e.getPlayer();
-        if (!joining.containsKey(bukkitPlayer.getUniqueId()))
-            bukkitPlayer.kickPlayer(ChatColor.RED + "Took too long to login.");
-        final TownyPlayer player = playerManager.initializePlayer(bukkitPlayer, joining.remove(bukkitPlayer.getUniqueId()));
-        //TODO - Donor custom join message
-        if (player.getWrapped().getName().equals("WesJD") ||
-                player.getWrapped().getName().equals("TheMrGong"))
-            player.setRank(Rank.ADMIN);
+        if (!joining.containsKey(bukkitPlayer.getUniqueId())) bukkitPlayer.kickPlayer(ChatColor.RED + "Took too long to login.");
+
+        playerManager.initializePlayer(bukkitPlayer, joining.remove(bukkitPlayer.getUniqueId()));
         e.setJoinMessage(ChatColor.GREEN.toString() + ChatColor.BOLD + "> " + ChatColor.WHITE + bukkitPlayer.getName());
     }
 

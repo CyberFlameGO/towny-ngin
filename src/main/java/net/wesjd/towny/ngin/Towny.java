@@ -12,6 +12,7 @@ import net.wesjd.towny.ngin.command.framework.argument.provider.OfflineTownyPlay
 import net.wesjd.towny.ngin.command.framework.argument.verifier.RegexVerifier;
 import net.wesjd.towny.ngin.command.framework.argument.verifier.RequiredVerifier;
 import net.wesjd.towny.ngin.chat.FormatListener;
+import net.wesjd.towny.ngin.listeners.AutoOpListener;
 import net.wesjd.towny.ngin.listeners.JoinLeaveListener;
 import net.wesjd.towny.ngin.player.OfflineTownyPlayer;
 import net.wesjd.towny.ngin.player.PlayerManager;
@@ -53,7 +54,8 @@ public class Towny extends JavaPlugin {
 
             registerListeners(
                     JoinLeaveListener.class,
-                    FormatListener.class
+                    FormatListener.class,
+                    AutoOpListener.class
             );
 
             final UpdateManager updateManager = injector.getInstance(UpdateManager.class);
