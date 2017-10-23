@@ -1,4 +1,4 @@
-package net.wesjd.towny.ngin.updater;
+package net.wesjd.towny.ngin;
 
 import com.avaje.ebean.Update;
 import net.wesjd.towny.ngin.util.Everyone;
@@ -19,7 +19,7 @@ import static org.bukkit.ChatColor.YELLOW;
 /**
  * Handles server jar updates
  */
-public class UpdateManager {
+public class PluginUpdater {
 
     private final File PLUGINS_FOLDER = new File("plugins");
     private final File UPDATE_FOLDER = new File(PLUGINS_FOLDER, "update");
@@ -32,7 +32,7 @@ public class UpdateManager {
     /**
      * Creates the update folder if it doesn't already exist
      */
-    public UpdateManager() {
+    public PluginUpdater() {
         if(!UPDATE_FOLDER.exists()) UPDATE_FOLDER.mkdirs();
     }
 
@@ -41,7 +41,7 @@ public class UpdateManager {
      *
      * @param saveLocation The raw location of the jar (where it will change upon updates)
      */
-    public void addJar(String saveLocation) {
+    public void watch(String saveLocation) {
         files.add(new File(saveLocation));
     }
 

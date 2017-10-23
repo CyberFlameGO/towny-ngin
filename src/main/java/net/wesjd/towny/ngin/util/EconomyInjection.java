@@ -1,4 +1,4 @@
-package net.wesjd.towny.ngin.util.economy;
+package net.wesjd.towny.ngin.util;
 
 import com.google.inject.Inject;
 import net.milkbowl.vault.economy.AbstractEconomy;

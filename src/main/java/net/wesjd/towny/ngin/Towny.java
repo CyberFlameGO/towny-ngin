@@ -19,9 +19,8 @@ import net.wesjd.towny.ngin.player.PlayerManager;
 import net.wesjd.towny.ngin.player.Rank;
 import net.wesjd.towny.ngin.storage.GStorageModule;
 import net.wesjd.towny.ngin.town.TownManager;
-import net.wesjd.towny.ngin.updater.UpdateManager;
 import net.wesjd.towny.ngin.util.Scheduling;
-import net.wesjd.towny.ngin.util.economy.EconomyInjection;
+import net.wesjd.towny.ngin.util.EconomyInjection;
 import org.bukkit.Bukkit;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.Plugin;
@@ -41,7 +40,7 @@ public class Towny extends JavaPlugin {
 
                     bind(PlayerManager.class).in(Singleton.class);
                     bind(CommandManager.class).in(Singleton.class);
-                    bind(UpdateManager.class).in(Singleton.class);
+                    bind(PluginUpdater.class).in(Singleton.class);
                     bind(ChatLock.class).in(Singleton.class);
                 }
             }
@@ -58,9 +57,9 @@ public class Towny extends JavaPlugin {
                     AutoOpListener.class
             );
 
-            final UpdateManager updateManager = injector.getInstance(UpdateManager.class);
-            updateManager.addJar("/home/customer/towny-ngin/target/ngin-LATEST.jar");
-            Scheduling.syncTimer(updateManager::checkForUpdates, 0, 20 * 15);
+            final PluginUpdater updater = injector.getInstance(PluginUpdater.class);
+            updater.watch("/home/customer/towny-ngin/target/ngin-LATEST.jar");
+            Scheduling.syncTimer(updater::checkForUpdates, 0, 20 * 15);
 
             final CommandManager commandManager = injector.getInstance(CommandManager.class);
             commandManager.addVerifier(Object.class, new RequiredVerifier());
