@@ -3,6 +3,7 @@ package net.wesjd.towny.ngin.util;
 import net.wesjd.towny.ngin.Towny;
 import net.wesjd.towny.ngin.player.PlayerManager;
 import net.wesjd.towny.ngin.player.TownyPlayer;
+import org.bukkit.Bukkit;
 
 import java.util.function.Consumer;
 
@@ -17,7 +18,7 @@ public class Everyone {
      * @param message The message to kick the players with
      */
     public static void kick(String message) {
-        each(player -> player.getWrapped().kickPlayer(message));
+        Bukkit.getOnlinePlayers().forEach(p -> p.kickPlayer(message));
     }
 
     /**
